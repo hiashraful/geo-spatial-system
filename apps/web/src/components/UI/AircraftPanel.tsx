@@ -3,6 +3,7 @@ import { useState, useMemo } from 'react';
 import { useTelemetryStore } from '../../store/useTelemetryStore';
 import type { AircraftData } from '../../store/useTelemetryStore';
 import { useMapStore } from '../../store/useMapStore';
+import { AircraftGauge } from './AircraftGauge';
 
 export function AircraftPanel() {
   const [collapsed, setCollapsed] = useState(false);
@@ -100,6 +101,35 @@ export function AircraftPanel() {
                   <DetailItem label="LAT" value={selectedData.latitude.toFixed(4)} />
                   <DetailItem label="LON" value={selectedData.longitude.toFixed(4)} />
                   <DetailItem label="CAT" value={selectedData.category} />
+                </div>
+                <div className="detail-gauges">
+                  <AircraftGauge
+                    value={selectedData.altitude}
+                    max={45000}
+                    label="ALTITUDE"
+                    unit="ft"
+                    color="#44aaff"
+                    width={88}
+                    height={44}
+                  />
+                  <AircraftGauge
+                    value={selectedData.velocity}
+                    max={600}
+                    label="SPEED"
+                    unit="kt"
+                    color="#00ff88"
+                    width={88}
+                    height={44}
+                  />
+                  <AircraftGauge
+                    value={Math.abs(selectedData.verticalRate)}
+                    max={3000}
+                    label="V/S RATE"
+                    unit="fpm"
+                    color={selectedData.verticalRate > 0 ? '#00ff88' : selectedData.verticalRate < 0 ? '#ffaa00' : '#8b949e'}
+                    width={88}
+                    height={44}
+                  />
                 </div>
                 {selectedData.trail && selectedData.trail.length > 0 && (
                   <div className="detail-trail-info">

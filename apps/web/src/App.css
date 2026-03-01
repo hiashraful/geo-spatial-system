@@ -56,13 +56,15 @@ html, body, #root {
   bottom: 0;
   pointer-events: none;
   z-index: 9999;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0, 255, 136, var(--scanline-opacity)) 2px,
-    rgba(0, 255, 136, var(--scanline-opacity)) 4px
-  );
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 255, 136, var(--scanline-opacity)) 2px,
+      rgba(0, 255, 136, var(--scanline-opacity)) 4px
+    ),
+    radial-gradient(ellipse at center, transparent 60%, rgba(0, 0, 0, 0.3) 100%);
 }
 
 /* ---- UI OVERLAY ---- */
@@ -955,6 +957,14 @@ html, body, #root {
 .detail-flyto:hover {
   background: var(--text-accent);
   color: #000;
+}
+
+/* ---- GAUGES ---- */
+.detail-gauges {
+  display: flex;
+  gap: 4px;
+  margin-top: 6px;
+  justify-content: center;
 }
 
 /* ---- TRAIL INFO ---- */
