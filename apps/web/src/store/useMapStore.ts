@@ -10,6 +10,11 @@ interface LayerVisibility {
   heatmap: boolean;
 }
 
+interface FlyToTarget {
+  center: [number, number];
+  zoom?: number;
+}
+
 interface MapState {
   center: [number, number];
   zoom: number;
@@ -18,6 +23,7 @@ interface MapState {
   layers: LayerVisibility;
   selectedAircraft: string | null;
   selectedCamera: string | null;
+  flyToTarget: FlyToTarget | null;
   setCenter: (center: [number, number]) => void;
   setZoom: (zoom: number) => void;
   setView: (center: [number, number], zoom: number) => void;
@@ -26,6 +32,8 @@ interface MapState {
   toggleLayer: (layer: keyof LayerVisibility) => void;
   setSelectedAircraft: (icao24: string | null) => void;
   setSelectedCamera: (cameraId: string | null) => void;
+  flyTo: (center: [number, number], zoom?: number) => void;
+  clearFlyTo: () => void;
 }
 
 export const useMapStore = create<MapState>()(
@@ -45,6 +53,7 @@ export const useMapStore = create<MapState>()(
       },
       selectedAircraft: null,
       selectedCamera: null,
+      flyToTarget: null,
       setCenter: (center) => set({ center }),
       setZoom: (zoom) => set({ zoom }),
       setView: (center, zoom) => set({ center, zoom }),
@@ -56,6 +65,8 @@ export const useMapStore = create<MapState>()(
         })),
       setSelectedAircraft: (icao24) => set({ selectedAircraft: icao24 }),
       setSelectedCamera: (cameraId) => set({ selectedCamera: cameraId }),
+      flyTo: (center, zoom) => set({ flyToTarget: { center, zoom } }),
+      clearFlyTo: () => set({ flyToTarget: null }),
     }),
     {
       name: 'geo-map-state',

@@ -6,6 +6,7 @@ import { DetectionPanel } from './components/UI/DetectionPanel';
 import { AlertsPanel } from './components/UI/AlertsPanel';
 import { StatusBar } from './components/UI/StatusBar';
 import { MiniRadar } from './components/UI/MiniRadar';
+import { CompassRose } from './components/UI/CompassRose';
 import { useWebSocket } from './hooks/useWebSocket';
 import { useEffect, useReducer } from 'react';
 import './App.css';
@@ -28,7 +29,10 @@ function App() {
         <div className="side-panels">
           <div className="left-panels">
             <LayerPanel />
-            <MiniRadar />
+            <div className="widgets-row">
+              <MiniRadar />
+              <CompassRose />
+            </div>
             <AlertsPanel />
           </div>
           <div className="right-panels">

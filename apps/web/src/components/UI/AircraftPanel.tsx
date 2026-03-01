@@ -12,6 +12,7 @@ export function AircraftPanel() {
   const aircraft = useTelemetryStore((s) => s.aircraft);
   const selectedAircraft = useMapStore((s) => s.selectedAircraft);
   const setSelectedAircraft = useMapStore((s) => s.setSelectedAircraft);
+  const flyTo = useMapStore((s) => s.flyTo);
 
   const sortedAircraft = useMemo(() => {
     let list = Array.from(aircraft.values());
@@ -44,6 +45,11 @@ export function AircraftPanel() {
 
   const selectedData = selectedAircraft ? aircraft.get(selectedAircraft) : null;
 
+  const handleFlyTo = (ac: AircraftData) => {
+    setSelectedAircraft(ac.icao24);
+    flyTo([ac.longitude, ac.latitude], 13);
+  };
+
   return (
     <motion.div
       initial={{ x: 300, opacity: 0 }}
@@ -72,6 +78,13 @@ export function AircraftPanel() {
                   <span className="detail-callsign">{selectedData.callsign}</span>
                   <span className="detail-icao">{selectedData.icao24}</span>
                   <button
+                    className="detail-flyto"
+                    onClick={() => handleFlyTo(selectedData)}
+                    title="Fly to aircraft"
+                  >
+                    FLY
+                  </button>
+                  <button
                     className="detail-close"
                     onClick={() => setSelectedAircraft(null)}
                   >
@@ -88,6 +101,11 @@ export function AircraftPanel() {
                   <DetailItem label="LON" value={selectedData.longitude.toFixed(4)} />
                   <DetailItem label="CAT" value={selectedData.category} />
                 </div>
+                {selectedData.trail && selectedData.trail.length > 0 && (
+                  <div className="detail-trail-info">
+                    TRAIL: {selectedData.trail.length} POSITIONS TRACKED
+                  </div>
+                )}
               </div>
             )}
 
@@ -114,15 +132,15 @@ export function AircraftPanel() {
 
             {/* Aircraft list */}
             <div className="aircraft-list">
-              {sortedAircraft.slice(0, 25).map((ac) => (
+              {sortedAircraft.slice(0, 30).map((ac) => (
                 <div
                   key={ac.icao24}
                   className={`aircraft-row ${selectedAircraft === ac.icao24 ? 'selected' : ''} ${ac.squawk === '7700' ? 'emergency' : ''}`}
-                  onClick={() => setSelectedAircraft(ac.icao24)}
+                  onClick={() => handleFlyTo(ac)}
                 >
                   <span className="ac-callsign">{ac.callsign || '------'}</span>
-                  <span className="ac-altitude">{Math.round(ac.altitude / 100)}</span>
-                  <span className="ac-speed">{ac.velocity}</span>
+                  <span className="ac-altitude">FL{Math.round(ac.altitude / 100)}</span>
+                  <span className="ac-speed">{ac.velocity}kt</span>
                   <span className={`ac-vs ${ac.verticalRate > 100 ? 'climbing' : ac.verticalRate < -100 ? 'descending' : ''}`}>
                     {ac.verticalRate > 100 ? '^' : ac.verticalRate < -100 ? 'v' : '-'}
                   </span>

@@ -38,6 +38,10 @@ export class DetectionSimulator {
     this.cameras = cameras;
   }
 
+  getCameraCount() {
+    return this.cameras.length;
+  }
+
   onDetection(callback) {
     this.listeners.push(callback);
     return () => {

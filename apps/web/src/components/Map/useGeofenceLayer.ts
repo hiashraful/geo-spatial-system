@@ -26,6 +26,7 @@ export function useGeofenceLayer(
             map.addSource('geofence-source', { type: 'geojson', data: geojson });
           }
 
+          // Fill layer with gradient-like opacity
           if (!map.getLayer('geofence-fill')) {
             map.addLayer({
               id: 'geofence-fill',
@@ -34,16 +35,38 @@ export function useGeofenceLayer(
               paint: {
                 'fill-color': [
                   'match', ['get', 'zoneType'],
-                  'restricted', '#ff444433',
-                  'no_fly', '#ff000033',
-                  'caution', '#ffaa0022',
-                  '#ffffff11',
+                  'restricted', '#ff4444',
+                  'no_fly', '#ff0000',
+                  'caution', '#ffaa00',
+                  '#ffffff',
                 ],
-                'fill-opacity': 0.4,
+                'fill-opacity': 0.08,
               },
             });
           }
 
+          // Outer glow border
+          if (!map.getLayer('geofence-border-glow')) {
+            map.addLayer({
+              id: 'geofence-border-glow',
+              type: 'line',
+              source: 'geofence-source',
+              paint: {
+                'line-color': [
+                  'match', ['get', 'zoneType'],
+                  'restricted', '#ff4444',
+                  'no_fly', '#ff0000',
+                  'caution', '#ffaa00',
+                  '#ffffff',
+                ],
+                'line-width': 6,
+                'line-opacity': 0.15,
+                'line-blur': 4,
+              },
+            });
+          }
+
+          // Main border - dashed
           if (!map.getLayer('geofence-border')) {
             map.addLayer({
               id: 'geofence-border',
@@ -57,28 +80,42 @@ export function useGeofenceLayer(
                   'caution', '#ffaa00',
                   '#ffffff',
                 ],
-                'line-width': 2,
-                'line-dasharray': [4, 2],
-                'line-opacity': 0.8,
+                'line-width': 1.5,
+                'line-dasharray': [6, 3],
+                'line-opacity': 0.7,
               },
             });
           }
 
+          // Zone labels with type prefix
           if (!map.getLayer('geofence-labels')) {
             map.addLayer({
               id: 'geofence-labels',
               type: 'symbol',
               source: 'geofence-source',
               layout: {
-                'text-field': ['get', 'name'],
+                'text-field': [
+                  'concat',
+                  ['upcase', ['get', 'zoneType']],
+                  ' - ',
+                  ['get', 'name'],
+                ],
                 'text-font': ['Open Sans Regular'],
                 'text-size': 11,
                 'text-allow-overlap': false,
+                'text-transform': 'uppercase',
+                'symbol-placement': 'point',
               },
               paint: {
-                'text-color': '#ff6666',
-                'text-halo-color': '#000000',
-                'text-halo-width': 1,
+                'text-color': [
+                  'match', ['get', 'zoneType'],
+                  'restricted', '#ff6666',
+                  'no_fly', '#ff4444',
+                  'caution', '#ffcc44',
+                  '#ffffff',
+                ],
+                'text-halo-color': '#000000cc',
+                'text-halo-width': 1.5,
               },
             });
           }
@@ -96,7 +133,7 @@ export function useGeofenceLayer(
     if (!map) return;
     const vis = layers.geofences ? 'visible' : 'none';
     try {
-      ['geofence-fill', 'geofence-border', 'geofence-labels'].forEach((id) => {
+      ['geofence-fill', 'geofence-border', 'geofence-border-glow', 'geofence-labels'].forEach((id) => {
         if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', vis);
       });
     } catch {}

@@ -12,7 +12,24 @@ function createAircraftIcon(color = '#00ff88'): string {
   return `data:image/svg+xml;base64,${btoa(svg)}`;
 }
 
-function aircraftToGeoJSON(aircraftMap: Map<string, AircraftData>) {
+function createSelectedIcon(): string {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+    <circle cx="20" cy="20" r="18" fill="none" stroke="#00ff88" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.6"/>
+    <path d="M20 4 L23.5 14 L34 16.5 L23.5 19 L23.5 32 L20 29.5 L16.5 32 L16.5 19 L6 16.5 L16.5 14 Z"
+          fill="#00ffcc" stroke="#fff" stroke-width="0.8" opacity="1"/>
+  </svg>`;
+  return `data:image/svg+xml;base64,${btoa(svg)}`;
+}
+
+function createEmergencyIcon(): string {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+    <path d="M16 2 L19 12 L28 14 L19 16 L19 26 L16 24 L13 26 L13 16 L4 14 L13 12 Z"
+          fill="#ff3333" stroke="#ff0000" stroke-width="1" opacity="0.95"/>
+  </svg>`;
+  return `data:image/svg+xml;base64,${btoa(svg)}`;
+}
+
+function aircraftToGeoJSON(aircraftMap: Map<string, AircraftData>, selectedIcao: string | null) {
   const features = Array.from(aircraftMap.values()).map((ac) => ({
     type: 'Feature' as const,
     properties: {
@@ -23,6 +40,8 @@ function aircraftToGeoJSON(aircraftMap: Map<string, AircraftData>) {
       velocity: ac.velocity,
       verticalRate: ac.verticalRate,
       squawk: ac.squawk,
+      isSelected: ac.icao24 === selectedIcao ? 1 : 0,
+      isEmergency: (ac.squawk === '7700' || ac.squawk === '7600' || ac.squawk === '7500') ? 1 : 0,
     },
     geometry: {
       type: 'Point' as const,
@@ -32,12 +51,16 @@ function aircraftToGeoJSON(aircraftMap: Map<string, AircraftData>) {
   return { type: 'FeatureCollection' as const, features };
 }
 
-function trailsToGeoJSON(aircraftMap: Map<string, AircraftData>) {
+function trailsToGeoJSON(aircraftMap: Map<string, AircraftData>, selectedIcao: string | null) {
   const features = Array.from(aircraftMap.values())
     .filter((ac) => ac.trail && ac.trail.length > 1)
     .map((ac) => ({
       type: 'Feature' as const,
-      properties: { icao24: ac.icao24, altitude: ac.altitude },
+      properties: {
+        icao24: ac.icao24,
+        altitude: ac.altitude,
+        isSelected: ac.icao24 === selectedIcao ? 1 : 0,
+      },
       geometry: {
         type: 'LineString' as const,
         coordinates: ac.trail.map(([lat, lon]) => [lon, lat]),
@@ -47,12 +70,25 @@ function trailsToGeoJSON(aircraftMap: Map<string, AircraftData>) {
 }
 
 function setupLayers(map: maplibregl.Map) {
-  // Load icon
-  const img = new Image(32, 32);
-  img.onload = () => {
-    if (map.hasImage('aircraft-icon')) return;
-    map.addImage('aircraft-icon', img, { sdf: false });
+  // Load icons
+  const loadImage = (name: string, src: string, size: number) => {
+    return new Promise<void>((resolve) => {
+      const img = new Image(size, size);
+      img.onload = () => {
+        if (!map.hasImage(name)) {
+          map.addImage(name, img, { sdf: false });
+        }
+        resolve();
+      };
+      img.src = src;
+    });
+  };
 
+  Promise.all([
+    loadImage('aircraft-icon', createAircraftIcon('#00ff88'), 32),
+    loadImage('aircraft-selected', createSelectedIcon(), 40),
+    loadImage('aircraft-emergency', createEmergencyIcon(), 32),
+  ]).then(() => {
     // Add sources
     if (!map.getSource('aircraft-source')) {
       map.addSource('aircraft-source', {
@@ -67,44 +103,84 @@ function setupLayers(map: maplibregl.Map) {
       });
     }
 
-    // Trail layer
+    // Trail layer - normal
     if (!map.getLayer('aircraft-trails')) {
       map.addLayer({
         id: 'aircraft-trails',
         type: 'line',
         source: 'trails-source',
+        filter: ['==', ['get', 'isSelected'], 0],
         paint: {
-          'line-color': '#00ff8866',
-          'line-width': 1.5,
-          'line-opacity': 0.6,
+          'line-color': '#00ff8844',
+          'line-width': 1.2,
+          'line-opacity': 0.5,
         },
       });
     }
 
-    // Aircraft symbols
+    // Trail layer - selected (brighter, thicker)
+    if (!map.getLayer('aircraft-trails-selected')) {
+      map.addLayer({
+        id: 'aircraft-trails-selected',
+        type: 'line',
+        source: 'trails-source',
+        filter: ['==', ['get', 'isSelected'], 1],
+        paint: {
+          'line-color': '#00ffcc',
+          'line-width': 2.5,
+          'line-opacity': 0.9,
+        },
+      });
+    }
+
+    // Aircraft symbols - regular
     if (!map.getLayer('aircraft-symbols')) {
       map.addLayer({
         id: 'aircraft-symbols',
         type: 'symbol',
         source: 'aircraft-source',
         layout: {
-          'icon-image': 'aircraft-icon',
-          'icon-size': 0.8,
+          'icon-image': [
+            'case',
+            ['==', ['get', 'isSelected'], 1], 'aircraft-selected',
+            ['==', ['get', 'isEmergency'], 1], 'aircraft-emergency',
+            'aircraft-icon',
+          ],
+          'icon-size': [
+            'case',
+            ['==', ['get', 'isSelected'], 1], 1.0,
+            0.8,
+          ],
           'icon-rotate': ['get', 'heading'],
           'icon-rotation-alignment': 'map',
           'icon-allow-overlap': true,
           'icon-ignore-placement': true,
           'text-field': ['get', 'callsign'],
           'text-font': ['Open Sans Regular'],
-          'text-size': 10,
+          'text-size': [
+            'case',
+            ['==', ['get', 'isSelected'], 1], 12,
+            10,
+          ],
           'text-offset': [0, 1.8],
           'text-anchor': 'top',
           'text-allow-overlap': false,
+          'symbol-sort-key': [
+            'case',
+            ['==', ['get', 'isSelected'], 1], 100,
+            ['==', ['get', 'isEmergency'], 1], 50,
+            0,
+          ],
         },
         paint: {
-          'text-color': '#88ffaa',
+          'text-color': [
+            'case',
+            ['==', ['get', 'isSelected'], 1], '#ffffff',
+            ['==', ['get', 'isEmergency'], 1], '#ff4444',
+            '#88ffaa',
+          ],
           'text-halo-color': '#000000',
-          'text-halo-width': 1,
+          'text-halo-width': 1.5,
         },
       });
     }
@@ -117,7 +193,7 @@ function setupLayers(map: maplibregl.Map) {
         source: 'aircraft-source',
         minzoom: 9,
         layout: {
-          'text-field': ['concat', ['to-string', ['round', ['/', ['get', 'altitude'], 100]]], ''],
+          'text-field': ['concat', 'FL', ['to-string', ['round', ['/', ['get', 'altitude'], 100]]]],
           'text-font': ['Open Sans Regular'],
           'text-size': 9,
           'text-offset': [2.5, 0],
@@ -125,16 +201,19 @@ function setupLayers(map: maplibregl.Map) {
           'text-allow-overlap': false,
         },
         paint: {
-          'text-color': '#aaffcc88',
+          'text-color': [
+            'case',
+            ['==', ['get', 'isSelected'], 1], '#00ffcc99',
+            '#aaffcc66',
+          ],
           'text-halo-color': '#00000088',
           'text-halo-width': 1,
         },
       });
     }
 
-    console.log('[Aircraft] Layers initialized');
-  };
-  img.src = createAircraftIcon('#00ff88');
+    console.log('[Aircraft] Layers initialized with selection support');
+  });
 }
 
 export function useAircraftLayer(
@@ -144,6 +223,7 @@ export function useAircraftLayer(
   const initialized = useRef(false);
   const aircraft = useTelemetryStore((s) => s.aircraft);
   const layers = useMapStore((s) => s.layers);
+  const selectedAircraft = useMapStore((s) => s.selectedAircraft);
 
   // Initialize: poll until map is ready
   useEffect(() => {
@@ -167,16 +247,15 @@ export function useAircraftLayer(
     const map = mapRef.current;
     if (!map) return;
 
-    // Try to update - sources may not exist yet
     try {
       const source = map.getSource('aircraft-source') as maplibregl.GeoJSONSource | undefined;
       const trailSource = map.getSource('trails-source') as maplibregl.GeoJSONSource | undefined;
-      if (source) source.setData(aircraftToGeoJSON(aircraft) as any);
-      if (trailSource) trailSource.setData(trailsToGeoJSON(aircraft) as any);
+      if (source) source.setData(aircraftToGeoJSON(aircraft, selectedAircraft) as any);
+      if (trailSource) trailSource.setData(trailsToGeoJSON(aircraft, selectedAircraft) as any);
     } catch {
       // Sources not ready yet
     }
-  }, [aircraft, mapRef]);
+  }, [aircraft, selectedAircraft, mapRef]);
 
   // Toggle visibility
   useEffect(() => {
@@ -189,6 +268,7 @@ export function useAircraftLayer(
       if (map.getLayer('aircraft-symbols')) map.setLayoutProperty('aircraft-symbols', 'visibility', vis);
       if (map.getLayer('aircraft-altitude-labels')) map.setLayoutProperty('aircraft-altitude-labels', 'visibility', vis);
       if (map.getLayer('aircraft-trails')) map.setLayoutProperty('aircraft-trails', 'visibility', trailVis);
+      if (map.getLayer('aircraft-trails-selected')) map.setLayoutProperty('aircraft-trails-selected', 'visibility', trailVis);
     } catch {}
   }, [layers.aircraft, layers.trails, mapRef]);
 }

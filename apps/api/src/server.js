@@ -148,6 +148,13 @@ app.get('/api/stats', async () => {
     ? Math.round(altitudes.reduce((a, b) => a + b, 0) / altitudes.length)
     : 0;
 
+  // Check AI service health
+  let aiServiceStatus = 'offline';
+  try {
+    const res = await fetch(`${config.aiService.url}/health`, { signal: AbortSignal.timeout(2000) });
+    if (res.ok) aiServiceStatus = 'online';
+  } catch {}
+
   return {
     totalAircraft: allAircraft.length,
     averageAltitude: avgAlt,
@@ -155,6 +162,8 @@ app.get('/api/stats', async () => {
     minAltitude: Math.min(Infinity, ...altitudes.filter(a => a > 0)),
     wsClients: wsClients.size,
     uptime: Math.round(process.uptime()),
+    aiService: aiServiceStatus,
+    detectionCameras: detectionSimulator.getCameraCount ? detectionSimulator.getCameraCount() : 0,
   };
 });
 

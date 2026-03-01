@@ -1,14 +1,43 @@
 import { motion } from 'framer-motion';
 import { useTelemetryStore } from '../../store/useTelemetryStore';
+import { useState, useEffect } from 'react';
+
+interface SystemStats {
+  totalAircraft: number;
+  averageAltitude: number;
+  maxAltitude: number;
+  minAltitude: number;
+  wsClients: number;
+  uptime: number;
+  aiService: string;
+  detectionCameras: number;
+}
 
 export function TopBar() {
   const wsConnected = useTelemetryStore((s) => s.wsConnected);
   const stats = useTelemetryStore((s) => s.stats);
-  const lastUpdate = useTelemetryStore((s) => s.lastUpdate);
+  const geofenceAlerts = useTelemetryStore((s) => s.geofenceAlerts);
+  const [sysStats, setSysStats] = useState<SystemStats | null>(null);
 
-  const timeSinceUpdate = lastUpdate > 0
-    ? Math.round((Date.now() - lastUpdate) / 1000)
-    : '--';
+  // Poll system stats every 5s
+  useEffect(() => {
+    const fetchStats = () => {
+      fetch('http://localhost:3001/api/stats')
+        .then((r) => r.json())
+        .then(setSysStats)
+        .catch(() => {});
+    };
+    fetchStats();
+    const iv = setInterval(fetchStats, 5000);
+    return () => clearInterval(iv);
+  }, []);
+
+  const formatUptime = (seconds: number) => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  };
 
   return (
     <motion.div
@@ -43,14 +72,37 @@ export function TopBar() {
         </div>
         <div className="stat-divider" />
         <div className="stat-item">
+          <span className="stat-label">CAMERAS</span>
+          <span className="stat-value">{sysStats?.detectionCameras ?? '--'}</span>
+        </div>
+        <div className="stat-divider" />
+        <div className="stat-item">
+          <span className="stat-label">ALERTS</span>
+          <span className={`stat-value ${geofenceAlerts.length > 0 ? 'status-warning' : ''}`}>
+            {geofenceAlerts.length}
+          </span>
+        </div>
+        <div className="stat-divider" />
+        <div className="stat-item">
           <span className="stat-label">UPLINK</span>
           <span className={`stat-value ${wsConnected ? 'status-ok' : 'status-error'}`}>
             {wsConnected ? 'ACTIVE' : 'OFFLINE'}
           </span>
         </div>
+        <div className="stat-divider" />
+        <div className="stat-item">
+          <span className="stat-label">AI SVC</span>
+          <span className={`stat-value ${sysStats?.aiService === 'online' ? 'status-ok' : 'status-error'}`}>
+            {sysStats?.aiService === 'online' ? 'ONLINE' : 'OFFLINE'}
+          </span>
+        </div>
       </div>
 
       <div className="top-bar-right">
+        <div className="system-uptime">
+          <span className="uptime-label">UPTIME</span>
+          <span className="uptime-value">{sysStats ? formatUptime(sysStats.uptime) : '--:--:--'}</span>
+        </div>
         <div className="clock">
           <ClockDisplay />
         </div>

@@ -149,9 +149,38 @@ html, body, #root {
   color: var(--text-accent);
 }
 
+.stat-value.status-warning {
+  color: var(--text-warning);
+}
+
 .stat-value.status-error {
   color: var(--text-error);
   animation: blink 1s ease-in-out infinite;
+}
+
+.top-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.system-uptime {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+}
+
+.uptime-label {
+  font-size: 8px;
+  color: var(--text-secondary);
+  letter-spacing: 1.5px;
+}
+
+.uptime-value {
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-weight: 500;
 }
 
 .stat-divider {
@@ -764,10 +793,17 @@ html, body, #root {
 /* ---- MAP OVERRIDES ---- */
 .maplibregl-ctrl-bottom-left {
   bottom: 32px !important;
+  z-index: 5 !important;
 }
 
 .maplibregl-ctrl-bottom-right {
   bottom: 32px !important;
+  right: 8px !important;
+  z-index: 5 !important;
+}
+
+.maplibregl-ctrl-top-right {
+  z-index: 5 !important;
 }
 
 .maplibregl-ctrl-group {
@@ -811,6 +847,13 @@ html, body, #root {
   color: var(--text-secondary) !important;
 }
 
+/* ---- WIDGETS ROW ---- */
+.widgets-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
 /* ---- MINI RADAR ---- */
 .mini-radar {
   background: var(--bg-panel);
@@ -827,6 +870,89 @@ html, body, #root {
   color: var(--text-secondary);
   padding: 3px 0;
   background: var(--bg-header);
+  border-top: 1px solid var(--border-color);
+}
+
+/* ---- COMPASS ROSE ---- */
+.compass-rose {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+}
+
+/* ---- CURSOR COORDS ---- */
+.cursor-coords {
+  color: var(--text-info) !important;
+  font-weight: 500;
+  min-width: 170px;
+  text-align: center;
+}
+
+/* ---- AIRCRAFT POPUP (hover tooltip) ---- */
+.tactical-popup .maplibregl-popup-content {
+  background: #0d1117ee;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 0;
+  font-family: var(--font-mono);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(12px);
+}
+
+.tactical-popup .maplibregl-popup-tip {
+  border-top-color: #0d1117ee;
+}
+
+.aircraft-popup {
+  padding: 8px 10px;
+  min-width: 160px;
+}
+
+.popup-callsign {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-accent);
+  letter-spacing: 1.5px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 4px;
+}
+
+.popup-row {
+  font-size: 9px;
+  color: var(--text-secondary);
+  letter-spacing: 0.8px;
+  padding: 1px 0;
+}
+
+/* ---- FLY TO BUTTON ---- */
+.detail-flyto {
+  background: none;
+  border: 1px solid var(--text-accent);
+  color: var(--text-accent);
+  cursor: pointer;
+  padding: 2px 8px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  border-radius: 2px;
+  letter-spacing: 1px;
+  transition: all 0.15s;
+}
+
+.detail-flyto:hover {
+  background: var(--text-accent);
+  color: #000;
+}
+
+/* ---- TRAIL INFO ---- */
+.detail-trail-info {
+  font-size: 8px;
+  color: var(--text-secondary);
+  letter-spacing: 1px;
+  margin-top: 6px;
+  padding-top: 4px;
   border-top: 1px solid var(--border-color);
 }
 
