@@ -13,6 +13,8 @@ import { WindIndicator } from './components/UI/WindIndicator';
 import { AircraftDrawer } from './components/UI/AircraftDrawer';
 import { AlertTicker } from './components/UI/AlertTicker';
 import { ScreenCapture } from './components/UI/ScreenCapture';
+import { AltitudeChart } from './components/UI/AltitudeChart';
+import { ThreatLevel } from './components/UI/ThreatLevel';
 import { useWebSocket } from './hooks/useWebSocket';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useEffect, useReducer } from 'react';
@@ -42,6 +44,10 @@ function App() {
               <MiniRadar />
               <CompassRose />
               <WindIndicator />
+            </div>
+            <div className="intel-row">
+              <ThreatLevel />
+              <AltitudeChart />
             </div>
             <div className="tools-row">
               <BasemapSelector />
