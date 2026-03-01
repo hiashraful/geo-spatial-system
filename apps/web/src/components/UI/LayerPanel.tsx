@@ -3,12 +3,12 @@ import { useState } from 'react';
 import { useMapStore } from '../../store/useMapStore';
 
 const LAYER_CONFIG = [
-  { key: 'aircraft' as const, label: 'AIRCRAFT', icon: 'A' },
-  { key: 'trails' as const, label: 'TRAILS', icon: 'T' },
-  { key: 'geofences' as const, label: 'GEOFENCES', icon: 'G' },
-  { key: 'cameras' as const, label: 'CAMERAS', icon: 'C' },
-  { key: 'detections' as const, label: 'DETECTIONS', icon: 'D' },
-  { key: 'heatmap' as const, label: 'HEATMAP', icon: 'H' },
+  { key: 'aircraft' as const, label: 'AIRCRAFT', icon: 'A', shortcut: '1' },
+  { key: 'trails' as const, label: 'TRAILS', icon: 'T', shortcut: '2' },
+  { key: 'geofences' as const, label: 'GEOFENCES', icon: 'G', shortcut: '3' },
+  { key: 'cameras' as const, label: 'CAMERAS', icon: 'C', shortcut: '4' },
+  { key: 'detections' as const, label: 'DETECTIONS', icon: 'D', shortcut: '5' },
+  { key: 'heatmap' as const, label: 'HEATMAP', icon: 'H', shortcut: '6' },
 ];
 
 export function LayerPanel() {
@@ -36,7 +36,7 @@ export function LayerPanel() {
             transition={{ duration: 0.2 }}
             className="panel-body"
           >
-            {LAYER_CONFIG.map(({ key, label, icon }) => (
+            {LAYER_CONFIG.map(({ key, label, icon, shortcut }) => (
               <div
                 key={key}
                 className={`layer-item ${layers[key] ? 'active' : ''}`}
@@ -44,6 +44,7 @@ export function LayerPanel() {
               >
                 <span className="layer-icon">{icon}</span>
                 <span className="layer-label">{label}</span>
+                <span className="layer-shortcut">{shortcut}</span>
                 <span className={`layer-indicator ${layers[key] ? 'on' : 'off'}`} />
               </div>
             ))}

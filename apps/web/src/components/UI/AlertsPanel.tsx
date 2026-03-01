@@ -1,10 +1,18 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { useTelemetryStore } from '../../store/useTelemetryStore';
+import { useMapStore } from '../../store/useMapStore';
 
 export function AlertsPanel() {
   const [collapsed, setCollapsed] = useState(false);
   const geofenceAlerts = useTelemetryStore((s) => s.geofenceAlerts);
+  const setSelectedAircraft = useMapStore((s) => s.setSelectedAircraft);
+  const flyTo = useMapStore((s) => s.flyTo);
+
+  const handleAlertClick = (alert: typeof geofenceAlerts[0]) => {
+    setSelectedAircraft(alert.aircraft.icao24);
+    flyTo([alert.aircraft.longitude, alert.aircraft.latitude], 12);
+  };
 
   return (
     <motion.div
@@ -39,6 +47,8 @@ export function AlertsPanel() {
                     initial={{ x: -20, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     className="alert-item"
+                    onClick={() => handleAlertClick(alert)}
+                    style={{ cursor: 'pointer' }}
                   >
                     <div className="alert-icon">!</div>
                     <div className="alert-content">
@@ -54,7 +64,8 @@ export function AlertsPanel() {
                       </div>
                       <div className="alert-meta">
                         ALT: {alert.aircraft.altitude.toLocaleString()} ft |
-                        SQK: {alert.aircraft.squawk}
+                        SQK: {alert.aircraft.squawk} |
+                        HDG: {alert.aircraft.heading.toFixed(0)}
                       </div>
                     </div>
                   </motion.div>

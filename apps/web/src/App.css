@@ -325,12 +325,23 @@ html, body, #root {
   color: var(--text-primary);
 }
 
-.layer-indicator {
+.layer-shortcut {
   margin-left: auto;
+  font-size: 8px;
+  color: var(--text-secondary);
+  opacity: 0.5;
+  background: #ffffff08;
+  padding: 1px 4px;
+  border-radius: 2px;
+  border: 1px solid #ffffff0a;
+}
+
+.layer-indicator {
   width: 6px;
   height: 6px;
   border-radius: 50%;
   background: #333;
+  margin-left: 6px;
 }
 
 .layer-indicator.on {

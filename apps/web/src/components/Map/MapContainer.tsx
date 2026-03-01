@@ -164,6 +164,43 @@ export function MapContainer() {
       }
     });
 
+    // Camera hover popup
+    map.on('mouseenter', 'camera-symbols', (e) => {
+      map.getCanvas().style.cursor = 'pointer';
+      if (e.features && e.features.length > 0) {
+        const props = e.features[0].properties;
+        if (!props) return;
+
+        const html = `
+          <div class="aircraft-popup">
+            <div class="popup-callsign" style="color: #44aaff;">${props.name || props.cameraId}</div>
+            <div class="popup-row">ID: ${props.cameraId}</div>
+            <div class="popup-row">STATUS: ${(props.status || 'active').toUpperCase()}</div>
+          </div>
+        `;
+
+        if (popupRef.current) popupRef.current.remove();
+        const coords = (e.features[0].geometry as any).coordinates.slice();
+        popupRef.current = new maplibregl.Popup({
+          closeButton: false,
+          closeOnClick: false,
+          className: 'tactical-popup',
+          offset: 15,
+        })
+          .setLngLat(coords)
+          .setHTML(html)
+          .addTo(map);
+      }
+    });
+
+    map.on('mouseleave', 'camera-symbols', () => {
+      map.getCanvas().style.cursor = '';
+      if (popupRef.current) {
+        popupRef.current.remove();
+        popupRef.current = null;
+      }
+    });
+
     // Emit mouse coordinates for the coordinate display
     map.on('mousemove', (e) => {
       window.dispatchEvent(

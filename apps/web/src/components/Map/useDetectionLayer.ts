@@ -28,13 +28,14 @@ export function useDetectionLayer(
         });
       }
 
-      if (!map.getLayer('detection-circles')) {
+      // Outer glow ring
+      if (!map.getLayer('detection-glow')) {
         map.addLayer({
-          id: 'detection-circles',
+          id: 'detection-glow',
           type: 'circle',
           source: 'detections-source',
           paint: {
-            'circle-radius': ['interpolate', ['linear'], ['get', 'confidence'], 0.6, 3, 1.0, 7],
+            'circle-radius': ['interpolate', ['linear'], ['get', 'confidence'], 0.6, 8, 1.0, 14],
             'circle-color': [
               'match', ['get', 'className'],
               'vehicle', '#44aaff',
@@ -47,9 +48,58 @@ export function useDetectionLayer(
               'suspicious_package', '#ff0000',
               '#ffffff',
             ],
-            'circle-opacity': 0.7,
+            'circle-opacity': 0.12,
+            'circle-blur': 1,
+          },
+        });
+      }
+
+      // Main detection dots
+      if (!map.getLayer('detection-circles')) {
+        map.addLayer({
+          id: 'detection-circles',
+          type: 'circle',
+          source: 'detections-source',
+          paint: {
+            'circle-radius': ['interpolate', ['linear'], ['get', 'confidence'], 0.6, 3, 1.0, 6],
+            'circle-color': [
+              'match', ['get', 'className'],
+              'vehicle', '#44aaff',
+              'person', '#ffaa00',
+              'truck', '#ff6644',
+              'bus', '#aa44ff',
+              'bicycle', '#44ff88',
+              'motorcycle', '#ff44aa',
+              'emergency_vehicle', '#ff0000',
+              'suspicious_package', '#ff0000',
+              '#ffffff',
+            ],
+            'circle-opacity': 0.8,
             'circle-stroke-color': '#ffffff22',
-            'circle-stroke-width': 1,
+            'circle-stroke-width': 0.5,
+          },
+        });
+      }
+
+      // Labels at high zoom for emergency/suspicious
+      if (!map.getLayer('detection-labels')) {
+        map.addLayer({
+          id: 'detection-labels',
+          type: 'symbol',
+          source: 'detections-source',
+          minzoom: 14,
+          filter: ['in', ['get', 'className'], ['literal', ['emergency_vehicle', 'suspicious_package']]],
+          layout: {
+            'text-field': ['upcase', ['get', 'className']],
+            'text-font': ['Open Sans Regular'],
+            'text-size': 9,
+            'text-offset': [0, 1.2],
+            'text-anchor': 'top',
+          },
+          paint: {
+            'text-color': '#ff4444',
+            'text-halo-color': '#000',
+            'text-halo-width': 1,
           },
         });
       }
@@ -81,10 +131,11 @@ export function useDetectionLayer(
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
+    const vis = layers.detections ? 'visible' : 'none';
     try {
-      if (map.getLayer('detection-circles')) {
-        map.setLayoutProperty('detection-circles', 'visibility', layers.detections ? 'visible' : 'none');
-      }
+      ['detection-glow', 'detection-circles', 'detection-labels'].forEach((id) => {
+        if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', vis);
+      });
     } catch {}
   }, [layers.detections, mapRef]);
 }

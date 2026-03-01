@@ -8,11 +8,13 @@ import { StatusBar } from './components/UI/StatusBar';
 import { MiniRadar } from './components/UI/MiniRadar';
 import { CompassRose } from './components/UI/CompassRose';
 import { useWebSocket } from './hooks/useWebSocket';
+import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useEffect, useReducer } from 'react';
 import './App.css';
 
 function App() {
   useWebSocket();
+  useKeyboardShortcuts();
   const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
 
   // Force clock updates every second
