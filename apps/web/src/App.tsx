@@ -12,6 +12,7 @@ import { MeasureTool } from './components/UI/MeasureTool';
 import { WindIndicator } from './components/UI/WindIndicator';
 import { AircraftDrawer } from './components/UI/AircraftDrawer';
 import { AlertTicker } from './components/UI/AlertTicker';
+import { ScreenCapture } from './components/UI/ScreenCapture';
 import { useWebSocket } from './hooks/useWebSocket';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useEffect, useReducer } from 'react';
@@ -45,6 +46,7 @@ function App() {
             <div className="tools-row">
               <BasemapSelector />
               <MeasureTool />
+              <ScreenCapture />
             </div>
             <AlertsPanel />
           </div>

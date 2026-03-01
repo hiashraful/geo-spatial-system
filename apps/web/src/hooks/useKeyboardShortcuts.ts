@@ -12,6 +12,14 @@ export function useKeyboardShortcuts() {
       // Don't trigger when typing in inputs
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
 
+      // Capture shortcut: Ctrl+Shift+S
+      if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        const captureBtn = document.querySelector('.capture-btn') as HTMLButtonElement;
+        if (captureBtn) captureBtn.click();
+        return;
+      }
+
       switch (e.key.toLowerCase()) {
         case '1':
           toggleLayer('aircraft');

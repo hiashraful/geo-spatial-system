@@ -1093,6 +1093,30 @@ html, body, #root {
   box-shadow: 0 0 8px #ff00ff33;
 }
 
+.capture-btn {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  padding: 4px 8px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  border-radius: 3px;
+  transition: all 0.15s;
+}
+
+.capture-btn:hover {
+  border-color: var(--text-info);
+  color: var(--text-info);
+}
+
+.capture-btn.active {
+  background: rgba(68, 170, 255, 0.1);
+  border-color: var(--text-info);
+  color: var(--text-info);
+}
+
 .measure-info {
   display: flex;
   align-items: center;

@@ -201,6 +201,7 @@ export function MapContainer() {
       maxZoom: 18,
       minZoom: 3,
       antialias: true,
+      preserveDrawingBuffer: true,
     });
 
     // Navigation controls
