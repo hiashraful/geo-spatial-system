@@ -131,6 +131,7 @@ function setupLayers(map: maplibregl.Map) {
       map.addSource('trails-source', {
         type: 'geojson',
         data: { type: 'FeatureCollection', features: [] },
+        lineMetrics: true,
       });
     }
     if (!map.getSource('prediction-source')) {
@@ -140,7 +141,7 @@ function setupLayers(map: maplibregl.Map) {
       });
     }
 
-    // Trail layer - normal (altitude-banded colors)
+    // Trail layer - normal with fade decay (line-gradient)
     if (!map.getLayer('aircraft-trails')) {
       map.addLayer({
         id: 'aircraft-trails',
@@ -152,19 +153,28 @@ function setupLayers(map: maplibregl.Map) {
             'interpolate',
             ['linear'],
             ['get', 'altitude'],
-            0, '#00ff88',      // Green - ground level
-            5000, '#44ddff',   // Cyan - low altitude
-            15000, '#ffaa00',  // Yellow/orange - medium
-            30000, '#ff4488',  // Pink - high
-            45000, '#cc44ff',  // Purple - very high
+            0, '#00ff88',
+            5000, '#44ddff',
+            15000, '#ffaa00',
+            30000, '#ff4488',
+            45000, '#cc44ff',
           ],
           'line-width': 1.2,
           'line-opacity': 0.5,
+          'line-gradient': [
+            'interpolate',
+            ['linear'],
+            ['line-progress'],
+            0, 'rgba(0, 255, 136, 0)',
+            0.3, 'rgba(0, 255, 136, 0.15)',
+            0.7, 'rgba(0, 255, 136, 0.35)',
+            1, 'rgba(0, 255, 136, 0.6)',
+          ],
         },
       });
     }
 
-    // Trail layer - selected (brighter, thicker, same altitude coloring)
+    // Trail layer - selected with brighter fade
     if (!map.getLayer('aircraft-trails-selected')) {
       map.addLayer({
         id: 'aircraft-trails-selected',
@@ -184,6 +194,15 @@ function setupLayers(map: maplibregl.Map) {
           ],
           'line-width': 2.5,
           'line-opacity': 0.9,
+          'line-gradient': [
+            'interpolate',
+            ['linear'],
+            ['line-progress'],
+            0, 'rgba(0, 255, 204, 0)',
+            0.2, 'rgba(0, 255, 204, 0.2)',
+            0.5, 'rgba(0, 255, 204, 0.5)',
+            1, 'rgba(0, 255, 204, 0.95)',
+          ],
         },
       });
     }

@@ -11,6 +11,7 @@ import { useHeatmapLayer } from './useHeatmapLayer';
 import { useBuildingLayer } from './useBuildingLayer';
 import { useGridOverlay } from './useGridOverlay';
 import { useRangeRings } from './useRangeRings';
+import { useProximityLayer } from './useProximityLayer';
 
 const BASEMAP_TILES: Record<string, string[]> = {
   dark: [
@@ -49,6 +50,7 @@ export function MapContainer() {
   useBuildingLayer(mapRef, mapLoaded);
   useGridOverlay(mapRef, mapLoaded);
   useRangeRings(mapRef, mapLoaded);
+  useProximityLayer(mapRef, mapLoaded);
 
   // Basemap switching
   useEffect(() => {

@@ -1801,6 +1801,19 @@ html, body, #root {
   letter-spacing: 0.5px;
 }
 
+/* ---- TIMELINE STRIP ---- */
+.timeline-strip {
+  background: linear-gradient(0deg, #0d1117cc 0%, #0d111744 100%);
+  border-top: 1px solid var(--border-color);
+  padding: 0 8px;
+  pointer-events: auto;
+}
+
+.timeline-strip canvas {
+  display: block;
+  width: 100%;
+}
+
 /* ---- RESPONSIVE ---- */
 @media (max-width: 768px) {
   .left-panels, .right-panels {

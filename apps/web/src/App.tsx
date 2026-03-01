@@ -20,6 +20,7 @@ import { SignalIndicator } from './components/UI/SignalIndicator';
 import { ShortcutsModal } from './components/UI/ShortcutsModal';
 import { SearchDialog } from './components/UI/SearchDialog';
 import { DataExport } from './components/UI/DataExport';
+import { Timeline } from './components/UI/Timeline';
 import { useWebSocket } from './hooks/useWebSocket';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useEffect, useReducer } from 'react';
@@ -69,6 +70,7 @@ function App() {
           </div>
         </div>
         <AircraftDrawer />
+        <Timeline />
         <StatusBar />
       </div>
       <ShortcutsModal />
