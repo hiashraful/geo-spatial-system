@@ -1380,10 +1380,29 @@ html, body, #root {
   margin-left: 4px;
 }
 
+.gauge-canvas-trail {
+  margin-left: 6px;
+  border-radius: 4px;
+  border: 1px solid #1a2332;
+}
+
+.drawer-trends {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.trend-canvas {
+  border-radius: 3px;
+}
+
 .drawer-data {
   display: flex;
   gap: 12px;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
 .drawer-data-row {
