@@ -1,0 +1,843 @@
+/* ============================================
+   GEOINT TACTICAL INTELLIGENCE - CSS
+   Military/Intelligence dashboard aesthetic
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap');
+
+:root {
+  --bg-primary: #0a0e14;
+  --bg-panel: #0d1117ee;
+  --bg-panel-solid: #0d1117;
+  --bg-header: #161b22;
+  --border-color: #1a2332;
+  --border-active: #00ff8844;
+  --text-primary: #c9d1d9;
+  --text-secondary: #8b949e;
+  --text-accent: #00ff88;
+  --text-warning: #ffaa00;
+  --text-error: #ff4444;
+  --text-info: #44aaff;
+  --green-glow: #00ff8833;
+  --red-glow: #ff444433;
+  --scanline-opacity: 0.03;
+  --font-mono: 'JetBrains Mono', 'Share Tech Mono', 'Consolas', monospace;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--font-mono);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 12px;
+}
+
+.app-root {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* Scanline overlay effect */
+.app-root::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 255, 136, var(--scanline-opacity)) 2px,
+    rgba(0, 255, 136, var(--scanline-opacity)) 4px
+  );
+}
+
+/* ---- UI OVERLAY ---- */
+.ui-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+}
+
+.ui-overlay > * {
+  pointer-events: auto;
+}
+
+/* ---- TOP BAR ---- */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 16px;
+  background: linear-gradient(180deg, #0d1117ee 0%, #0d111700 100%);
+  border-bottom: 1px solid var(--border-color);
+  backdrop-filter: blur(8px);
+}
+
+.system-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.title-bracket {
+  color: var(--text-accent);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.title-text {
+  color: var(--text-accent);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 3px;
+}
+
+.title-sub {
+  color: var(--text-secondary);
+  font-size: 10px;
+  letter-spacing: 2px;
+  margin-left: 8px;
+}
+
+.top-bar-center {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.stat-label {
+  font-size: 9px;
+  color: var(--text-secondary);
+  letter-spacing: 1.5px;
+}
+
+.stat-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.stat-value.status-ok {
+  color: var(--text-accent);
+}
+
+.stat-value.status-error {
+  color: var(--text-error);
+  animation: blink 1s ease-in-out infinite;
+}
+
+.stat-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--border-color);
+}
+
+.clock-display {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+}
+
+.clock-time {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-accent);
+  letter-spacing: 1px;
+}
+
+.clock-date {
+  font-size: 9px;
+  color: var(--text-secondary);
+}
+
+/* ---- SIDE PANELS ---- */
+.side-panels {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  padding: 8px;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.side-panels > * {
+  pointer-events: auto;
+}
+
+.left-panels, .right-panels {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 280px;
+  min-width: 220px;
+}
+
+.right-panels {
+  align-items: flex-end;
+}
+
+/* ---- PANEL COMMON ---- */
+.layer-panel,
+.aircraft-panel,
+.detection-panel,
+.alerts-panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  backdrop-filter: blur(12px);
+  overflow: hidden;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--bg-header);
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+  user-select: none;
+}
+
+.panel-header:hover {
+  background: #1c2333;
+}
+
+.panel-title {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: var(--text-accent);
+}
+
+.panel-toggle {
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.panel-body {
+  overflow: hidden;
+}
+
+/* ---- LAYER PANEL ---- */
+.layer-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background 0.15s;
+  border-bottom: 1px solid #ffffff06;
+}
+
+.layer-item:hover {
+  background: #ffffff08;
+}
+
+.layer-item.active {
+  background: #00ff8808;
+}
+
+.layer-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 2px;
+}
+
+.layer-item.active .layer-icon {
+  color: var(--text-accent);
+  border-color: var(--text-accent);
+}
+
+.layer-label {
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+}
+
+.layer-item.active .layer-label {
+  color: var(--text-primary);
+}
+
+.layer-indicator {
+  margin-left: auto;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #333;
+}
+
+.layer-indicator.on {
+  background: var(--text-accent);
+  box-shadow: 0 0 6px var(--text-accent);
+}
+
+/* ---- AIRCRAFT PANEL ---- */
+.aircraft-panel {
+  max-height: 60vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.aircraft-panel .panel-body {
+  overflow-y: auto;
+  max-height: calc(60vh - 36px);
+}
+
+.aircraft-panel .panel-body::-webkit-scrollbar {
+  width: 4px;
+}
+
+.aircraft-panel .panel-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.aircraft-panel .panel-body::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 2px;
+}
+
+/* Aircraft detail */
+.aircraft-detail {
+  padding: 8px;
+  border-bottom: 1px solid var(--border-active);
+  background: #00ff8806;
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.detail-callsign {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-accent);
+}
+
+.detail-icao {
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+.detail-close {
+  margin-left: auto;
+  background: none;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 2px 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  border-radius: 2px;
+}
+
+.detail-close:hover {
+  border-color: var(--text-error);
+  color: var(--text-error);
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+
+.detail-item.highlight {
+  background: var(--red-glow);
+}
+
+.detail-label {
+  font-size: 9px;
+  color: var(--text-secondary);
+  letter-spacing: 1px;
+}
+
+.detail-value {
+  font-size: 10px;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.detail-item.highlight .detail-value {
+  color: var(--text-error);
+  font-weight: 700;
+}
+
+/* List controls */
+.list-controls {
+  padding: 6px 8px;
+  display: flex;
+  gap: 6px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.filter-input {
+  flex: 1;
+  background: #0a0e14;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 4px 8px;
+  border-radius: 2px;
+  outline: none;
+  letter-spacing: 1px;
+}
+
+.filter-input:focus {
+  border-color: var(--text-accent);
+}
+
+.filter-input::placeholder {
+  color: var(--text-secondary);
+}
+
+.sort-buttons {
+  display: flex;
+  gap: 2px;
+}
+
+.sort-btn {
+  background: var(--bg-header);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  padding: 3px 6px;
+  cursor: pointer;
+  border-radius: 2px;
+  letter-spacing: 1px;
+}
+
+.sort-btn.active {
+  border-color: var(--text-accent);
+  color: var(--text-accent);
+}
+
+/* Aircraft rows */
+.aircraft-list {
+  font-size: 10px;
+}
+
+.aircraft-row {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px;
+  gap: 8px;
+  cursor: pointer;
+  border-bottom: 1px solid #ffffff04;
+  transition: background 0.1s;
+}
+
+.aircraft-row:hover {
+  background: #ffffff08;
+}
+
+.aircraft-row.selected {
+  background: #00ff8810;
+  border-left: 2px solid var(--text-accent);
+}
+
+.aircraft-row.emergency {
+  background: #ff000010;
+  border-left: 2px solid var(--text-error);
+}
+
+.ac-callsign {
+  width: 70px;
+  font-weight: 500;
+  color: var(--text-primary);
+  letter-spacing: 0.5px;
+}
+
+.ac-altitude {
+  width: 35px;
+  text-align: right;
+  color: var(--text-info);
+}
+
+.ac-speed {
+  width: 35px;
+  text-align: right;
+  color: var(--text-secondary);
+}
+
+.ac-vs {
+  width: 12px;
+  text-align: center;
+  font-weight: 700;
+}
+
+.ac-vs.climbing {
+  color: var(--text-accent);
+}
+
+.ac-vs.descending {
+  color: var(--text-warning);
+}
+
+/* ---- DETECTION PANEL ---- */
+.detection-panel {
+  max-width: 280px;
+}
+
+.detection-summary {
+  padding: 8px;
+}
+
+.detection-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.detection-class {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  width: 80px;
+  text-align: right;
+}
+
+.detection-bar-bg {
+  flex: 1;
+  height: 8px;
+  background: #ffffff08;
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.detection-bar-fill {
+  height: 100%;
+  border-radius: 1px;
+  opacity: 0.8;
+}
+
+.detection-count {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-primary);
+  width: 25px;
+  text-align: right;
+}
+
+.camera-detections {
+  padding: 4px 8px 8px;
+  border-top: 1px solid var(--border-color);
+  margin-top: 4px;
+}
+
+.camera-det-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 0;
+  font-size: 9px;
+}
+
+.camera-id {
+  color: var(--text-info);
+}
+
+.camera-det-count {
+  color: var(--text-secondary);
+}
+
+/* ---- ALERTS PANEL ---- */
+.alert-header {
+  border-left: 2px solid var(--text-warning);
+}
+
+.alert-badge {
+  background: var(--text-error);
+  color: #000;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 8px;
+  margin-left: 6px;
+}
+
+.no-alerts {
+  padding: 12px;
+  text-align: center;
+  font-size: 10px;
+  color: var(--text-secondary);
+  letter-spacing: 2px;
+}
+
+.alerts-list {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.alert-item {
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  border-bottom: 1px solid var(--border-color);
+  background: #ff000005;
+}
+
+.alert-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--text-warning);
+  color: #000;
+  font-weight: 900;
+  font-size: 14px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.alert-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.alert-title {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-warning);
+  margin-bottom: 3px;
+}
+
+.alert-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 3px;
+}
+
+.zone-tag {
+  font-size: 8px;
+  padding: 1px 4px;
+  border-radius: 2px;
+  letter-spacing: 0.5px;
+}
+
+.zone-tag.restricted {
+  background: #ff444422;
+  color: #ff4444;
+  border: 1px solid #ff444444;
+}
+
+.zone-tag.no_fly {
+  background: #ff000022;
+  color: #ff0000;
+  border: 1px solid #ff000044;
+}
+
+.zone-tag.caution {
+  background: #ffaa0022;
+  color: #ffaa00;
+  border: 1px solid #ffaa0044;
+}
+
+.alert-meta {
+  font-size: 9px;
+  color: var(--text-secondary);
+}
+
+/* ---- STATUS BAR ---- */
+.status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 28px;
+  padding: 0 12px;
+  background: linear-gradient(0deg, #0d1117ee 0%, #0d111700 100%);
+  border-top: 1px solid var(--border-color);
+  font-size: 9px;
+  letter-spacing: 1px;
+  backdrop-filter: blur(8px);
+}
+
+.status-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.status-dot.connected {
+  background: var(--text-accent);
+  box-shadow: 0 0 8px var(--text-accent);
+}
+
+.status-dot.disconnected {
+  background: var(--text-error);
+  box-shadow: 0 0 8px var(--text-error);
+  animation: blink 1s ease-in-out infinite;
+}
+
+.status-text {
+  color: var(--text-secondary);
+}
+
+.status-center {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-item {
+  color: var(--text-secondary);
+}
+
+.status-sep {
+  color: var(--border-color);
+}
+
+.status-right {
+  color: var(--text-accent);
+  font-weight: 500;
+}
+
+/* ---- ANIMATIONS ---- */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.3); opacity: 0.2; }
+  100% { transform: scale(1); opacity: 0.6; }
+}
+
+/* ---- MAP OVERRIDES ---- */
+.maplibregl-ctrl-bottom-left {
+  bottom: 32px !important;
+}
+
+.maplibregl-ctrl-bottom-right {
+  bottom: 32px !important;
+}
+
+.maplibregl-ctrl-group {
+  background: var(--bg-panel-solid) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 4px !important;
+}
+
+.maplibregl-ctrl-group button {
+  background-color: transparent !important;
+  border-color: var(--border-color) !important;
+}
+
+.maplibregl-ctrl-group button + button {
+  border-top: 1px solid var(--border-color) !important;
+}
+
+.maplibregl-ctrl-group button:hover {
+  background-color: #1c2333 !important;
+}
+
+.maplibregl-ctrl-group button .maplibregl-ctrl-icon {
+  filter: invert(1) brightness(0.7);
+}
+
+.maplibregl-ctrl-scale {
+  background: var(--bg-panel-solid) !important;
+  border-color: var(--text-accent) !important;
+  color: var(--text-accent) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 9px !important;
+  padding: 0 5px !important;
+}
+
+.maplibregl-ctrl-attrib {
+  background: transparent !important;
+  font-size: 8px !important;
+}
+
+.maplibregl-ctrl-attrib a {
+  color: var(--text-secondary) !important;
+}
+
+/* ---- MINI RADAR ---- */
+.mini-radar {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+}
+
+.radar-label {
+  text-align: center;
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: var(--text-secondary);
+  padding: 3px 0;
+  background: var(--bg-header);
+  border-top: 1px solid var(--border-color);
+}
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 768px) {
+  .left-panels, .right-panels {
+    max-width: 200px;
+    min-width: 160px;
+  }
+
+  .top-bar-center {
+    display: none;
+  }
+}
