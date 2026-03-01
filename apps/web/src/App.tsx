@@ -21,8 +21,10 @@ import { ShortcutsModal } from './components/UI/ShortcutsModal';
 import { SearchDialog } from './components/UI/SearchDialog';
 import { DataExport } from './components/UI/DataExport';
 import { Timeline } from './components/UI/Timeline';
+import { ViewModeSelector } from './components/UI/ViewModeSelector';
 import { useWebSocket } from './hooks/useWebSocket';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
+import { useMapStore } from './store/useMapStore';
 import { useEffect, useReducer } from 'react';
 import './App.css';
 
@@ -30,6 +32,7 @@ function App() {
   useWebSocket();
   useKeyboardShortcuts();
   const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
+  const viewMode = useMapStore((s) => s.viewMode);
 
   // Force clock updates every second
   useEffect(() => {
@@ -38,7 +41,7 @@ function App() {
   }, []);
 
   return (
-    <div className="app-root">
+    <div className={`app-root ${viewMode !== 'normal' ? `viewmode-${viewMode}` : ''}`}>
       <MapContainer />
       <div className="ui-overlay">
         <TopBar />
@@ -58,6 +61,7 @@ function App() {
             <TrafficSparklines />
             <div className="tools-row">
               <BasemapSelector />
+              <ViewModeSelector />
               <MeasureTool />
               <ScreenCapture />
               <DataExport />

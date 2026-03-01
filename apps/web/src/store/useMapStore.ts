@@ -14,6 +14,7 @@ interface LayerVisibility {
 
 export type BasemapStyle = 'dark' | 'voyager' | 'satellite';
 export type ActiveTool = 'none' | 'measure';
+export type ViewMode = 'normal' | 'nv' | 'ir';
 
 interface FlyToTarget {
   center: [number, number];
@@ -32,6 +33,7 @@ interface MapState {
   layers: LayerVisibility;
   basemap: BasemapStyle;
   activeTool: ActiveTool;
+  viewMode: ViewMode;
   measurePoints: MeasurePoint[];
   selectedAircraft: string | null;
   selectedCamera: string | null;
@@ -44,6 +46,7 @@ interface MapState {
   toggleLayer: (layer: keyof LayerVisibility) => void;
   setBasemap: (basemap: BasemapStyle) => void;
   setActiveTool: (tool: ActiveTool) => void;
+  setViewMode: (mode: ViewMode) => void;
   addMeasurePoint: (point: MeasurePoint) => void;
   clearMeasurePoints: () => void;
   setSelectedAircraft: (icao24: string | null) => void;
@@ -71,6 +74,7 @@ export const useMapStore = create<MapState>()(
       },
       basemap: 'dark' as BasemapStyle,
       activeTool: 'none' as ActiveTool,
+      viewMode: 'normal' as ViewMode,
       measurePoints: [],
       selectedAircraft: null,
       selectedCamera: null,
@@ -86,6 +90,7 @@ export const useMapStore = create<MapState>()(
         })),
       setBasemap: (basemap) => set({ basemap }),
       setActiveTool: (tool) => set({ activeTool: tool, measurePoints: [] }),
+      setViewMode: (mode) => set({ viewMode: mode }),
       addMeasurePoint: (point) =>
         set((state) => ({
           measurePoints: [...state.measurePoints.slice(-1), point],

@@ -1801,6 +1801,93 @@ html, body, #root {
   letter-spacing: 0.5px;
 }
 
+/* ---- VIEW MODE SELECTOR ---- */
+.viewmode-selector {
+  display: flex;
+  gap: 2px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 2px;
+  backdrop-filter: blur(12px);
+}
+
+.viewmode-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 1px;
+  padding: 3px 6px;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.15s;
+}
+
+.viewmode-btn:hover {
+  background: #ffffff08;
+  color: var(--text-primary);
+}
+
+.viewmode-btn.active.normal {
+  background: var(--bg-header);
+  border-color: var(--text-accent);
+  color: var(--text-accent);
+}
+
+.viewmode-btn.active.nv {
+  background: #00ff0015;
+  border-color: #00ff00;
+  color: #00ff00;
+  text-shadow: 0 0 6px #00ff0066;
+}
+
+.viewmode-btn.active.ir {
+  background: #ff880015;
+  border-color: #ff8800;
+  color: #ff8800;
+  text-shadow: 0 0 6px #ff880066;
+}
+
+/* ---- VIEW MODE FILTERS ---- */
+.app-root.viewmode-nv > div:first-child {
+  filter: saturate(0) brightness(0.7) contrast(1.2);
+}
+
+.app-root.viewmode-nv > div:first-child::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 255, 0, 0.08);
+  mix-blend-mode: multiply;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.app-root.viewmode-nv {
+  --text-accent: #00ff00;
+  --green-glow: #00ff0033;
+  --border-active: #00ff0044;
+}
+
+.app-root.viewmode-nv .scanline-effect {
+  --scanline-opacity: 0.06;
+}
+
+.app-root.viewmode-ir > div:first-child {
+  filter: saturate(0) brightness(0.6) contrast(1.3) sepia(1) hue-rotate(-20deg);
+}
+
+.app-root.viewmode-ir {
+  --text-accent: #ff8800;
+  --green-glow: #ff880033;
+  --border-active: #ff880044;
+}
+
 /* ---- TIMELINE STRIP ---- */
 .timeline-strip {
   background: linear-gradient(0deg, #0d1117cc 0%, #0d111744 100%);
