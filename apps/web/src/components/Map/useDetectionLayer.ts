@@ -120,7 +120,13 @@ export function useDetectionLayer(
           type: 'FeatureCollection',
           features: detections.map((det) => ({
             type: 'Feature',
-            properties: { id: det.id, className: det.className, confidence: det.confidence },
+            properties: {
+              id: det.id,
+              className: det.className,
+              confidence: det.confidence,
+              sourceId: det.sourceId,
+              sourceName: det.sourceName,
+            },
             geometry: { type: 'Point', coordinates: [det.longitude, det.latitude] },
           })),
         } as any);

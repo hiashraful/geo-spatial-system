@@ -13,6 +13,17 @@ import { useGridOverlay } from './useGridOverlay';
 import { useRangeRings } from './useRangeRings';
 import { useProximityLayer } from './useProximityLayer';
 
+const CLASS_COLORS: Record<string, string> = {
+  vehicle: '#44aaff',
+  person: '#ffaa00',
+  truck: '#ff6644',
+  bus: '#aa44ff',
+  bicycle: '#44ff88',
+  motorcycle: '#ff44aa',
+  emergency_vehicle: '#ff0000',
+  suspicious_package: '#ff0000',
+};
+
 const BASEMAP_TILES: Record<string, string[]> = {
   dark: [
     'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
@@ -231,9 +242,11 @@ export function MapContainer() {
     map.on('click', (e) => {
       // Skip if measuring
       if (useMapStore.getState().activeTool === 'measure') return;
-      const features = map.queryRenderedFeatures(e.point, {
-        layers: ['aircraft-symbols'],
-      });
+      const interactiveLayers = ['aircraft-symbols', 'detection-circles', 'camera-symbols'];
+      const existingLayers = interactiveLayers.filter((l) => map.getLayer(l));
+      const features = existingLayers.length > 0
+        ? map.queryRenderedFeatures(e.point, { layers: existingLayers })
+        : [];
       if (!features.length) {
         setSelectedAircraft(null);
       }
@@ -310,6 +323,83 @@ export function MapContainer() {
     });
 
     map.on('mouseleave', 'camera-symbols', () => {
+      map.getCanvas().style.cursor = '';
+      if (popupRef.current) {
+        popupRef.current.remove();
+        popupRef.current = null;
+      }
+    });
+
+    // Detection click - fly to detection and show popup
+    map.on('click', 'detection-circles', (e) => {
+      if (useMapStore.getState().activeTool === 'measure') return;
+      if (e.features && e.features.length > 0) {
+        const props = e.features[0].properties;
+        if (!props) return;
+
+        const coords = (e.features[0].geometry as any).coordinates.slice();
+        const conf = (Number(props.confidence) * 100).toFixed(0);
+        const clsLabel = (props.className || 'unknown').replace(/_/g, ' ').toUpperCase();
+
+        const html = `
+          <div class="aircraft-popup detection-popup">
+            <div class="popup-callsign" style="color: ${CLASS_COLORS[props.className] || '#fff'};">${clsLabel}</div>
+            <div class="popup-row">CONFIDENCE: ${conf}%</div>
+            <div class="popup-row">SOURCE: ${props.sourceName || props.sourceId || '--'}</div>
+            <div class="popup-row">${Number(coords[1]).toFixed(5)}, ${Number(coords[0]).toFixed(5)}</div>
+          </div>
+        `;
+
+        if (popupRef.current) popupRef.current.remove();
+        popupRef.current = new maplibregl.Popup({
+          closeButton: true,
+          closeOnClick: true,
+          className: 'tactical-popup',
+          offset: 10,
+        })
+          .setLngLat(coords)
+          .setHTML(html)
+          .addTo(map);
+
+        // Fly to detection location
+        map.flyTo({
+          center: coords,
+          zoom: Math.max(map.getZoom(), 15),
+          duration: 800,
+          essential: true,
+        });
+      }
+    });
+
+    // Detection hover
+    map.on('mouseenter', 'detection-circles', (e) => {
+      map.getCanvas().style.cursor = 'pointer';
+      if (e.features && e.features.length > 0) {
+        const props = e.features[0].properties;
+        if (!props) return;
+        const coords = (e.features[0].geometry as any).coordinates.slice();
+        const clsLabel = (props.className || 'unknown').replace(/_/g, ' ').toUpperCase();
+        const conf = (Number(props.confidence) * 100).toFixed(0);
+
+        if (popupRef.current) popupRef.current.remove();
+        popupRef.current = new maplibregl.Popup({
+          closeButton: false,
+          closeOnClick: false,
+          className: 'tactical-popup',
+          offset: 10,
+        })
+          .setLngLat(coords)
+          .setHTML(`
+            <div class="aircraft-popup">
+              <div class="popup-callsign" style="color: ${CLASS_COLORS[props.className] || '#fff'};">${clsLabel}</div>
+              <div class="popup-row">CONF ${conf}%</div>
+            </div>
+          `)
+          .addTo(map);
+      }
+    });
+
+    map.on('mouseleave', 'detection-circles', () => {
       map.getCanvas().style.cursor = '';
       if (popupRef.current) {
         popupRef.current.remove();

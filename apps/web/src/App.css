@@ -636,8 +636,23 @@ html, body, #root {
 .camera-det-row {
   display: flex;
   justify-content: space-between;
-  padding: 2px 0;
+  padding: 2px 4px;
   font-size: 9px;
+  border-radius: 2px;
+  transition: background 0.15s;
+}
+
+.camera-det-row.clickable {
+  cursor: pointer;
+}
+
+.camera-det-row.clickable:hover {
+  background: #44aaff15;
+}
+
+.camera-det-row.clickable:hover .camera-id {
+  color: #66ccff;
+  text-decoration: underline;
 }
 
 .camera-id {

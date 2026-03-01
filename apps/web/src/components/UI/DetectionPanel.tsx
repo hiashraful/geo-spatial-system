@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useTelemetryStore } from '../../store/useTelemetryStore';
+import { useMapStore } from '../../store/useMapStore';
 
 const CLASS_COLORS: Record<string, string> = {
   vehicle: '#44aaff',
@@ -17,6 +18,17 @@ export function DetectionPanel() {
   const [collapsed, setCollapsed] = useState(false);
   const detectionSummary = useTelemetryStore((s) => s.detectionSummary);
   const detections = useTelemetryStore((s) => s.detections);
+  const flyTo = useMapStore((s) => s.flyTo);
+  const setSelectedCamera = useMapStore((s) => s.setSelectedCamera);
+
+  const flyToCamera = useCallback((cameraId: string) => {
+    // Find a detection from this camera to get its coordinates
+    const det = detections.find((d) => d.sourceId === cameraId || d.sourceName === cameraId);
+    if (det) {
+      flyTo([det.longitude, det.latitude], 16);
+      setSelectedCamera(cameraId);
+    }
+  }, [detections, flyTo, setSelectedCamera]);
 
   // Aggregate totals by class
   const classTotals = useMemo(() => {
@@ -80,7 +92,12 @@ export function DetectionPanel() {
               {Object.entries(detectionSummary).slice(0, 5).map(([cameraId, classes]) => {
                 const total = Object.values(classes).reduce((a, b) => a + b, 0);
                 return (
-                  <div key={cameraId} className="camera-det-row">
+                  <div
+                    key={cameraId}
+                    className="camera-det-row clickable"
+                    onClick={() => flyToCamera(cameraId)}
+                    title={`Fly to ${cameraId}`}
+                  >
                     <span className="camera-id">{cameraId}</span>
                     <span className="camera-det-count">{total} objects</span>
                   </div>
