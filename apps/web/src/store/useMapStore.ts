@@ -8,11 +8,19 @@ interface LayerVisibility {
   cameras: boolean;
   detections: boolean;
   heatmap: boolean;
+  buildings: boolean;
 }
+
+export type BasemapStyle = 'dark' | 'voyager' | 'satellite';
+export type ActiveTool = 'none' | 'measure';
 
 interface FlyToTarget {
   center: [number, number];
   zoom?: number;
+}
+
+export interface MeasurePoint {
+  lngLat: [number, number];
 }
 
 interface MapState {
@@ -21,6 +29,9 @@ interface MapState {
   bearing: number;
   pitch: number;
   layers: LayerVisibility;
+  basemap: BasemapStyle;
+  activeTool: ActiveTool;
+  measurePoints: MeasurePoint[];
   selectedAircraft: string | null;
   selectedCamera: string | null;
   flyToTarget: FlyToTarget | null;
@@ -30,6 +41,10 @@ interface MapState {
   setBearing: (bearing: number) => void;
   setPitch: (pitch: number) => void;
   toggleLayer: (layer: keyof LayerVisibility) => void;
+  setBasemap: (basemap: BasemapStyle) => void;
+  setActiveTool: (tool: ActiveTool) => void;
+  addMeasurePoint: (point: MeasurePoint) => void;
+  clearMeasurePoints: () => void;
   setSelectedAircraft: (icao24: string | null) => void;
   setSelectedCamera: (cameraId: string | null) => void;
   flyTo: (center: [number, number], zoom?: number) => void;
@@ -50,7 +65,11 @@ export const useMapStore = create<MapState>()(
         cameras: true,
         detections: true,
         heatmap: false,
+        buildings: true,
       },
+      basemap: 'dark' as BasemapStyle,
+      activeTool: 'none' as ActiveTool,
+      measurePoints: [],
       selectedAircraft: null,
       selectedCamera: null,
       flyToTarget: null,
@@ -63,6 +82,13 @@ export const useMapStore = create<MapState>()(
         set((state) => ({
           layers: { ...state.layers, [layer]: !state.layers[layer] },
         })),
+      setBasemap: (basemap) => set({ basemap }),
+      setActiveTool: (tool) => set({ activeTool: tool, measurePoints: [] }),
+      addMeasurePoint: (point) =>
+        set((state) => ({
+          measurePoints: [...state.measurePoints.slice(-1), point],
+        })),
+      clearMeasurePoints: () => set({ measurePoints: [] }),
       setSelectedAircraft: (icao24) => set({ selectedAircraft: icao24 }),
       setSelectedCamera: (cameraId) => set({ selectedCamera: cameraId }),
       flyTo: (center, zoom) => set({ flyToTarget: { center, zoom } }),
@@ -70,7 +96,7 @@ export const useMapStore = create<MapState>()(
     }),
     {
       name: 'geo-map-state',
-      partialize: (state) => ({ layers: state.layers }),
+      partialize: (state) => ({ layers: state.layers, basemap: state.basemap }),
     }
   )
 );

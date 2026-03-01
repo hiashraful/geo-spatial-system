@@ -8,20 +8,125 @@ import { useGeofenceLayer } from './useGeofenceLayer';
 import { useCameraLayer } from './useCameraLayer';
 import { useDetectionLayer } from './useDetectionLayer';
 import { useHeatmapLayer } from './useHeatmapLayer';
+import { useBuildingLayer } from './useBuildingLayer';
+
+const BASEMAP_TILES: Record<string, string[]> = {
+  dark: [
+    'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
+    'https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
+    'https://c.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png',
+  ],
+  voyager: [
+    'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',
+    'https://b.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',
+    'https://c.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png',
+  ],
+  satellite: [
+    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+  ],
+};
 
 export function MapContainer() {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const mapLoaded = useRef(false);
   const popupRef = useRef<maplibregl.Popup | null>(null);
+  const measureSourceAdded = useRef(false);
 
   const { center, zoom, bearing, pitch, setSelectedAircraft, selectedAircraft, flyToTarget, clearFlyTo } = useMapStore();
+  const basemap = useMapStore((s) => s.basemap);
+  const activeTool = useMapStore((s) => s.activeTool);
+  const addMeasurePoint = useMapStore((s) => s.addMeasurePoint);
+  const measurePoints = useMapStore((s) => s.measurePoints);
 
   useAircraftLayer(mapRef, mapLoaded);
   useGeofenceLayer(mapRef, mapLoaded);
   useCameraLayer(mapRef, mapLoaded);
   useDetectionLayer(mapRef, mapLoaded);
   useHeatmapLayer(mapRef, mapLoaded);
+  useBuildingLayer(mapRef, mapLoaded);
+
+  // Basemap switching
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapLoaded.current) return;
+
+    const source = map.getSource('osm-tiles') as maplibregl.RasterTileSource | undefined;
+    if (source && typeof source.setTiles === 'function') {
+      source.setTiles(BASEMAP_TILES[basemap] || BASEMAP_TILES.dark);
+    }
+  }, [basemap]);
+
+  // Measurement tool - draw line between points
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapLoaded.current) return;
+
+    // Initialize measure source/layers once
+    if (!measureSourceAdded.current && !map.getSource('measure-source')) {
+      map.addSource('measure-source', {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: [] },
+      });
+
+      map.addLayer({
+        id: 'measure-line',
+        type: 'line',
+        source: 'measure-source',
+        paint: {
+          'line-color': '#ff00ff',
+          'line-width': 2,
+          'line-dasharray': [4, 4],
+        },
+      });
+
+      map.addLayer({
+        id: 'measure-points',
+        type: 'circle',
+        source: 'measure-source',
+        filter: ['==', '$type', 'Point'],
+        paint: {
+          'circle-radius': 5,
+          'circle-color': '#ff00ff',
+          'circle-stroke-color': '#ffffff',
+          'circle-stroke-width': 2,
+        },
+      });
+
+      measureSourceAdded.current = true;
+    }
+
+    // Update measure source data
+    try {
+      const source = map.getSource('measure-source') as maplibregl.GeoJSONSource | undefined;
+      if (!source) return;
+
+      const features: any[] = [];
+
+      // Add points
+      for (const pt of measurePoints) {
+        features.push({
+          type: 'Feature',
+          geometry: { type: 'Point', coordinates: pt.lngLat },
+          properties: {},
+        });
+      }
+
+      // Add line if 2 points
+      if (measurePoints.length === 2) {
+        features.push({
+          type: 'Feature',
+          geometry: {
+            type: 'LineString',
+            coordinates: measurePoints.map((p) => p.lngLat),
+          },
+          properties: {},
+        });
+      }
+
+      source.setData({ type: 'FeatureCollection', features } as any);
+    } catch {}
+  }, [measurePoints]);
 
   // Fly-to when target changes
   useEffect(() => {
@@ -105,6 +210,8 @@ export function MapContainer() {
 
     // Click handler for aircraft
     map.on('click', 'aircraft-symbols', (e) => {
+      // Skip if measuring
+      if (useMapStore.getState().activeTool === 'measure') return;
       if (e.features && e.features.length > 0) {
         const icao24 = e.features[0].properties?.icao24;
         if (icao24) {
@@ -115,6 +222,8 @@ export function MapContainer() {
 
     // Click on empty space deselects
     map.on('click', (e) => {
+      // Skip if measuring
+      if (useMapStore.getState().activeTool === 'measure') return;
       const features = map.queryRenderedFeatures(e.point, {
         layers: ['aircraft-symbols'],
       });
@@ -201,6 +310,17 @@ export function MapContainer() {
       }
     });
 
+    // Measurement tool click handler
+    map.on('click', (e) => {
+      const tool = useMapStore.getState().activeTool;
+      if (tool === 'measure') {
+        useMapStore.getState().addMeasurePoint({
+          lngLat: [e.lngLat.lng, e.lngLat.lat],
+        });
+        return; // Don't trigger other click handlers when measuring
+      }
+    });
+
     // Emit mouse coordinates for the coordinate display
     map.on('mousemove', (e) => {
       window.dispatchEvent(
@@ -221,10 +341,14 @@ export function MapContainer() {
 
     mapRef.current = map;
 
+    // Expose map for debugging
+    (window as any).__map = map;
+
     return () => {
       map.remove();
       mapRef.current = null;
       mapLoaded.current = false;
+      delete (window as any).__map;
     };
   }, []);
 

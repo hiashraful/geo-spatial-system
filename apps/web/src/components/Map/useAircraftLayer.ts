@@ -59,6 +59,8 @@ function trailsToGeoJSON(aircraftMap: Map<string, AircraftData>, selectedIcao: s
       properties: {
         icao24: ac.icao24,
         altitude: ac.altitude,
+        // Altitude band: 0=low(<5k), 1=med(5k-15k), 2=high(15k-30k), 3=vhigh(>30k)
+        altBand: ac.altitude < 5000 ? 0 : ac.altitude < 15000 ? 1 : ac.altitude < 30000 ? 2 : 3,
         isSelected: ac.icao24 === selectedIcao ? 1 : 0,
       },
       geometry: {
@@ -103,7 +105,7 @@ function setupLayers(map: maplibregl.Map) {
       });
     }
 
-    // Trail layer - normal
+    // Trail layer - normal (altitude-banded colors)
     if (!map.getLayer('aircraft-trails')) {
       map.addLayer({
         id: 'aircraft-trails',
@@ -111,14 +113,23 @@ function setupLayers(map: maplibregl.Map) {
         source: 'trails-source',
         filter: ['==', ['get', 'isSelected'], 0],
         paint: {
-          'line-color': '#00ff8844',
+          'line-color': [
+            'interpolate',
+            ['linear'],
+            ['get', 'altitude'],
+            0, '#00ff88',      // Green - ground level
+            5000, '#44ddff',   // Cyan - low altitude
+            15000, '#ffaa00',  // Yellow/orange - medium
+            30000, '#ff4488',  // Pink - high
+            45000, '#cc44ff',  // Purple - very high
+          ],
           'line-width': 1.2,
           'line-opacity': 0.5,
         },
       });
     }
 
-    // Trail layer - selected (brighter, thicker)
+    // Trail layer - selected (brighter, thicker, same altitude coloring)
     if (!map.getLayer('aircraft-trails-selected')) {
       map.addLayer({
         id: 'aircraft-trails-selected',
@@ -126,7 +137,16 @@ function setupLayers(map: maplibregl.Map) {
         source: 'trails-source',
         filter: ['==', ['get', 'isSelected'], 1],
         paint: {
-          'line-color': '#00ffcc',
+          'line-color': [
+            'interpolate',
+            ['linear'],
+            ['get', 'altitude'],
+            0, '#44ffaa',
+            5000, '#66eeff',
+            15000, '#ffcc33',
+            30000, '#ff66aa',
+            45000, '#dd66ff',
+          ],
           'line-width': 2.5,
           'line-opacity': 0.9,
         },

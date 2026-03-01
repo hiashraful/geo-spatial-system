@@ -977,6 +977,126 @@ html, body, #root {
   border-top: 1px solid var(--border-color);
 }
 
+/* ---- TOOLS ROW ---- */
+.tools-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+/* ---- BASEMAP SELECTOR ---- */
+.basemap-selector {
+  display: flex;
+  gap: 2px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 2px;
+  backdrop-filter: blur(12px);
+}
+
+.basemap-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 1px;
+  padding: 3px 6px;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.15s;
+}
+
+.basemap-btn:hover {
+  background: #ffffff08;
+  color: var(--text-primary);
+}
+
+.basemap-btn.active {
+  background: var(--bg-header);
+  border-color: var(--text-accent);
+  color: var(--text-accent);
+}
+
+/* ---- MEASURE TOOL ---- */
+.measure-tool {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 2px 4px;
+  backdrop-filter: blur(12px);
+}
+
+.measure-btn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 1px;
+  padding: 3px 8px;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.15s;
+}
+
+.measure-btn:hover {
+  background: #ffffff08;
+  color: var(--text-primary);
+}
+
+.measure-btn.active {
+  background: #ff00ff15;
+  border-color: #ff00ff;
+  color: #ff00ff;
+  box-shadow: 0 0 8px #ff00ff33;
+}
+
+.measure-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.measure-hint {
+  font-size: 8px;
+  color: #ff00ff;
+  letter-spacing: 0.5px;
+  animation: blink 1.5s ease-in-out infinite;
+}
+
+.measure-distance {
+  font-size: 10px;
+  font-weight: 600;
+  color: #ff00ff;
+  letter-spacing: 0.5px;
+}
+
+.measure-clear {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 8px;
+  padding: 1px 4px;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.measure-clear:hover {
+  border-color: var(--text-error);
+  color: var(--text-error);
+}
+
+/* ---- MEASURE CURSOR ---- */
+.app-root.measuring {
+  cursor: crosshair !important;
+}
+
 /* ---- RESPONSIVE ---- */
 @media (max-width: 768px) {
   .left-panels, .right-panels {

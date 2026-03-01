@@ -9,6 +9,7 @@ const LAYER_CONFIG = [
   { key: 'cameras' as const, label: 'CAMERAS', icon: 'C', shortcut: '4' },
   { key: 'detections' as const, label: 'DETECTIONS', icon: 'D', shortcut: '5' },
   { key: 'heatmap' as const, label: 'HEATMAP', icon: 'H', shortcut: '6' },
+  { key: 'buildings' as const, label: '3D BUILDINGS', icon: 'B', shortcut: '7' },
 ];
 
 export function LayerPanel() {

@@ -7,6 +7,8 @@ import { AlertsPanel } from './components/UI/AlertsPanel';
 import { StatusBar } from './components/UI/StatusBar';
 import { MiniRadar } from './components/UI/MiniRadar';
 import { CompassRose } from './components/UI/CompassRose';
+import { BasemapSelector } from './components/UI/BasemapSelector';
+import { MeasureTool } from './components/UI/MeasureTool';
 import { useWebSocket } from './hooks/useWebSocket';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useEffect, useReducer } from 'react';
@@ -34,6 +36,10 @@ function App() {
             <div className="widgets-row">
               <MiniRadar />
               <CompassRose />
+            </div>
+            <div className="tools-row">
+              <BasemapSelector />
+              <MeasureTool />
             </div>
             <AlertsPanel />
           </div>
