@@ -9,6 +9,7 @@ interface LayerVisibility {
   detections: boolean;
   heatmap: boolean;
   buildings: boolean;
+  grid: boolean;
 }
 
 export type BasemapStyle = 'dark' | 'voyager' | 'satellite';
@@ -66,6 +67,7 @@ export const useMapStore = create<MapState>()(
         detections: true,
         heatmap: false,
         buildings: true,
+        grid: false,
       },
       basemap: 'dark' as BasemapStyle,
       activeTool: 'none' as ActiveTool,

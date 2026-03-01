@@ -791,6 +791,18 @@ html, body, #root {
   font-weight: 500;
 }
 
+.cursor-coords {
+  color: var(--text-info);
+  font-family: var(--font-mono);
+  letter-spacing: 0.5px;
+}
+
+.status-alert-badge {
+  color: var(--text-error) !important;
+  font-weight: 600;
+  animation: blink 1.5s ease-in-out infinite;
+}
+
 /* ---- ANIMATIONS ---- */
 @keyframes blink {
   0%, 100% { opacity: 1; }
@@ -888,6 +900,15 @@ html, body, #root {
 
 /* ---- COMPASS ROSE ---- */
 .compass-rose {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+}
+
+/* ---- WIND INDICATOR ---- */
+.wind-indicator {
   background: var(--bg-panel);
   border: 1px solid var(--border-color);
   border-radius: 4px;
@@ -1095,6 +1116,134 @@ html, body, #root {
 /* ---- MEASURE CURSOR ---- */
 .app-root.measuring {
   cursor: crosshair !important;
+}
+
+/* ---- AIRCRAFT DRAWER ---- */
+.aircraft-drawer {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  border-top: 2px solid var(--text-accent);
+  border-radius: 6px 6px 0 0;
+  padding: 8px 12px;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+  min-width: 420px;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.drawer-callsign {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.drawer-bracket {
+  color: var(--text-accent);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.drawer-name {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.drawer-icao {
+  color: var(--text-secondary);
+  font-size: 10px;
+  margin-left: 6px;
+}
+
+.drawer-status {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-left: auto;
+}
+
+.drawer-squawk, .drawer-cat {
+  font-size: 10px;
+  color: var(--text-secondary);
+  background: var(--bg-header);
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.drawer-vs {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.drawer-close {
+  background: none;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 2px 6px;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: all 0.15s;
+}
+
+.drawer-close:hover {
+  border-color: var(--text-error);
+  color: var(--text-error);
+}
+
+.drawer-gauges {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.gauge-canvas {
+  border-radius: 50%;
+}
+
+.gauge-canvas-vs {
+  margin-left: 4px;
+}
+
+.drawer-data {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.drawer-data-row {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.drawer-label {
+  font-size: 9px;
+  color: var(--text-secondary);
+}
+
+.drawer-value {
+  font-size: 9px;
+  color: var(--text-accent);
+  font-weight: 500;
 }
 
 /* ---- RESPONSIVE ---- */

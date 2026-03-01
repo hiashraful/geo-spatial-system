@@ -71,6 +71,35 @@ function trailsToGeoJSON(aircraftMap: Map<string, AircraftData>, selectedIcao: s
   return { type: 'FeatureCollection' as const, features };
 }
 
+function predictionsToGeoJSON(aircraftMap: Map<string, AircraftData>, selectedIcao: string | null) {
+  const features = Array.from(aircraftMap.values())
+    .filter((ac) => ac.velocity > 50 && !ac.onGround) // Only for airborne, moving aircraft
+    .map((ac) => {
+      // Project 60 seconds ahead based on heading and velocity
+      const speedMps = ac.velocity * 0.514444; // knots to m/s
+      const distanceM = speedMps * 60; // 60 second prediction
+      const distanceDeg = distanceM / 111320; // rough meters to degrees
+      const hdgRad = (ac.heading * Math.PI) / 180;
+      const endLat = ac.latitude + distanceDeg * Math.cos(hdgRad);
+      const endLon = ac.longitude + distanceDeg * Math.sin(hdgRad) / Math.cos(ac.latitude * Math.PI / 180);
+      return {
+        type: 'Feature' as const,
+        properties: {
+          icao24: ac.icao24,
+          isSelected: ac.icao24 === selectedIcao ? 1 : 0,
+        },
+        geometry: {
+          type: 'LineString' as const,
+          coordinates: [
+            [ac.longitude, ac.latitude],
+            [endLon, endLat],
+          ],
+        },
+      };
+    });
+  return { type: 'FeatureCollection' as const, features };
+}
+
 function setupLayers(map: maplibregl.Map) {
   // Load icons
   const loadImage = (name: string, src: string, size: number) => {
@@ -100,6 +129,12 @@ function setupLayers(map: maplibregl.Map) {
     }
     if (!map.getSource('trails-source')) {
       map.addSource('trails-source', {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: [] },
+      });
+    }
+    if (!map.getSource('prediction-source')) {
+      map.addSource('prediction-source', {
         type: 'geojson',
         data: { type: 'FeatureCollection', features: [] },
       });
@@ -149,6 +184,33 @@ function setupLayers(map: maplibregl.Map) {
           ],
           'line-width': 2.5,
           'line-opacity': 0.9,
+        },
+      });
+    }
+
+    // Prediction lines - dotted lines showing projected path
+    if (!map.getLayer('aircraft-predictions')) {
+      map.addLayer({
+        id: 'aircraft-predictions',
+        type: 'line',
+        source: 'prediction-source',
+        paint: {
+          'line-color': [
+            'case',
+            ['==', ['get', 'isSelected'], 1], '#00ffcc',
+            '#00ff8844',
+          ],
+          'line-width': [
+            'case',
+            ['==', ['get', 'isSelected'], 1], 1.5,
+            0.8,
+          ],
+          'line-dasharray': [2, 4],
+          'line-opacity': [
+            'case',
+            ['==', ['get', 'isSelected'], 1], 0.8,
+            0.3,
+          ],
         },
       });
     }
@@ -270,8 +332,10 @@ export function useAircraftLayer(
     try {
       const source = map.getSource('aircraft-source') as maplibregl.GeoJSONSource | undefined;
       const trailSource = map.getSource('trails-source') as maplibregl.GeoJSONSource | undefined;
+      const predSource = map.getSource('prediction-source') as maplibregl.GeoJSONSource | undefined;
       if (source) source.setData(aircraftToGeoJSON(aircraft, selectedAircraft) as any);
       if (trailSource) trailSource.setData(trailsToGeoJSON(aircraft, selectedAircraft) as any);
+      if (predSource) predSource.setData(predictionsToGeoJSON(aircraft, selectedAircraft) as any);
     } catch {
       // Sources not ready yet
     }
@@ -289,6 +353,7 @@ export function useAircraftLayer(
       if (map.getLayer('aircraft-altitude-labels')) map.setLayoutProperty('aircraft-altitude-labels', 'visibility', vis);
       if (map.getLayer('aircraft-trails')) map.setLayoutProperty('aircraft-trails', 'visibility', trailVis);
       if (map.getLayer('aircraft-trails-selected')) map.setLayoutProperty('aircraft-trails-selected', 'visibility', trailVis);
+      if (map.getLayer('aircraft-predictions')) map.setLayoutProperty('aircraft-predictions', 'visibility', trailVis);
     } catch {}
   }, [layers.aircraft, layers.trails, mapRef]);
 }

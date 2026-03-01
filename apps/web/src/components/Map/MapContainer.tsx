@@ -9,6 +9,7 @@ import { useCameraLayer } from './useCameraLayer';
 import { useDetectionLayer } from './useDetectionLayer';
 import { useHeatmapLayer } from './useHeatmapLayer';
 import { useBuildingLayer } from './useBuildingLayer';
+import { useGridOverlay } from './useGridOverlay';
 
 const BASEMAP_TILES: Record<string, string[]> = {
   dark: [
@@ -45,6 +46,7 @@ export function MapContainer() {
   useDetectionLayer(mapRef, mapLoaded);
   useHeatmapLayer(mapRef, mapLoaded);
   useBuildingLayer(mapRef, mapLoaded);
+  useGridOverlay(mapRef, mapLoaded);
 
   // Basemap switching
   useEffect(() => {

@@ -34,6 +34,9 @@ export function useKeyboardShortcuts() {
         case '7':
           toggleLayer('buildings');
           break;
+        case '8':
+          toggleLayer('grid');
+          break;
         case 'm':
           // Toggle measure tool
           {

@@ -1,12 +1,23 @@
 import { useTelemetryStore } from '../../store/useTelemetryStore';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+
+function formatDMS(deg: number, isLat: boolean): string {
+  const dir = isLat ? (deg >= 0 ? 'N' : 'S') : (deg >= 0 ? 'E' : 'W');
+  const abs = Math.abs(deg);
+  const d = Math.floor(abs);
+  const m = Math.floor((abs - d) * 60);
+  const s = ((abs - d - m / 60) * 3600).toFixed(1);
+  return `${d}°${m.toString().padStart(2, '0')}'${s.padStart(4, '0')}"${dir}`;
+}
 
 export function StatusBar() {
   const wsConnected = useTelemetryStore((s) => s.wsConnected);
   const lastUpdate = useTelemetryStore((s) => s.lastUpdate);
   const stats = useTelemetryStore((s) => s.stats);
+  const geofenceAlerts = useTelemetryStore((s) => s.geofenceAlerts);
   const [elapsed, setElapsed] = useState(0);
   const [cursorCoords, setCursorCoords] = useState('--');
+  const frameCount = useRef(0);
 
   useEffect(() => {
     const iv = setInterval(() => {
@@ -19,10 +30,11 @@ export function StatusBar() {
 
   useEffect(() => {
     const handler = (e: CustomEvent<{ lat: number; lng: number }>) => {
+      // Throttle to every 3rd event for DMS formatting
+      frameCount.current++;
+      if (frameCount.current % 3 !== 0) return;
       const { lat, lng } = e.detail;
-      const latDir = lat >= 0 ? 'N' : 'S';
-      const lngDir = lng >= 0 ? 'E' : 'W';
-      setCursorCoords(`${Math.abs(lat).toFixed(4)}${latDir} ${Math.abs(lng).toFixed(4)}${lngDir}`);
+      setCursorCoords(`${formatDMS(lat, true)} ${formatDMS(lng, false)}`);
     };
     window.addEventListener('map-mousemove' as any, handler);
     return () => window.removeEventListener('map-mousemove' as any, handler);
@@ -41,9 +53,17 @@ export function StatusBar() {
         <span className="status-sep">|</span>
         <span className="status-item">TRACKS: {stats.totalAircraft}</span>
         <span className="status-sep">|</span>
+        <span className="status-item">DET: {stats.totalDetections}</span>
+        <span className="status-sep">|</span>
         <span className="status-item cursor-coords">{cursorCoords}</span>
         <span className="status-sep">|</span>
-        <span className="status-item">EPSG:4326</span>
+        <span className="status-item">WGS84</span>
+        {geofenceAlerts.length > 0 && (
+          <>
+            <span className="status-sep">|</span>
+            <span className="status-item status-alert-badge">BREACH: {geofenceAlerts.length}</span>
+          </>
+        )}
       </div>
       <div className="status-right">
         <span className="status-item">SYS OPERATIONAL</span>

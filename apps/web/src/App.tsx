@@ -9,6 +9,8 @@ import { MiniRadar } from './components/UI/MiniRadar';
 import { CompassRose } from './components/UI/CompassRose';
 import { BasemapSelector } from './components/UI/BasemapSelector';
 import { MeasureTool } from './components/UI/MeasureTool';
+import { WindIndicator } from './components/UI/WindIndicator';
+import { AircraftDrawer } from './components/UI/AircraftDrawer';
 import { useWebSocket } from './hooks/useWebSocket';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useEffect, useReducer } from 'react';
@@ -36,6 +38,7 @@ function App() {
             <div className="widgets-row">
               <MiniRadar />
               <CompassRose />
+              <WindIndicator />
             </div>
             <div className="tools-row">
               <BasemapSelector />
@@ -48,6 +51,7 @@ function App() {
             <DetectionPanel />
           </div>
         </div>
+        <AircraftDrawer />
         <StatusBar />
       </div>
     </div>
