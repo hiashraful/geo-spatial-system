@@ -15,6 +15,11 @@ import { AlertTicker } from './components/UI/AlertTicker';
 import { ScreenCapture } from './components/UI/ScreenCapture';
 import { AltitudeChart } from './components/UI/AltitudeChart';
 import { ThreatLevel } from './components/UI/ThreatLevel';
+import { TrafficSparklines } from './components/UI/TrafficSparklines';
+import { SignalIndicator } from './components/UI/SignalIndicator';
+import { ShortcutsModal } from './components/UI/ShortcutsModal';
+import { SearchDialog } from './components/UI/SearchDialog';
+import { DataExport } from './components/UI/DataExport';
 import { useWebSocket } from './hooks/useWebSocket';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useEffect, useReducer } from 'react';
@@ -49,10 +54,12 @@ function App() {
               <ThreatLevel />
               <AltitudeChart />
             </div>
+            <TrafficSparklines />
             <div className="tools-row">
               <BasemapSelector />
               <MeasureTool />
               <ScreenCapture />
+              <DataExport />
             </div>
             <AlertsPanel />
           </div>
@@ -64,6 +71,8 @@ function App() {
         <AircraftDrawer />
         <StatusBar />
       </div>
+      <ShortcutsModal />
+      <SearchDialog />
     </div>
   );
 }

@@ -39,6 +39,13 @@ export interface GeofenceAlert {
   violations: { id: number; name: string; zone_type: string }[];
 }
 
+export interface HistoryPoint {
+  timestamp: number;
+  tracks: number;
+  detections: number;
+  alerts: number;
+}
+
 interface TelemetryState {
   aircraft: Map<string, AircraftData>;
   detections: Detection[];
@@ -46,16 +53,22 @@ interface TelemetryState {
   geofenceAlerts: GeofenceAlert[];
   wsConnected: boolean;
   lastUpdate: number;
+  history: HistoryPoint[];
   stats: {
     totalAircraft: number;
     averageAltitude: number;
     totalDetections: number;
   };
+  wsLatency: number;
+  msgRate: number;
   updateAircraft: (data: AircraftData[]) => void;
   updateDetections: (payload: DetectionPayload) => void;
   addGeofenceAlert: (alert: GeofenceAlert) => void;
   setWsConnected: (connected: boolean) => void;
+  setWsLatency: (ms: number) => void;
+  setMsgRate: (rate: number) => void;
   getAircraftArray: () => AircraftData[];
+  pushHistory: () => void;
 }
 
 export const useTelemetryStore = create<TelemetryState>((set, get) => ({
@@ -65,6 +78,9 @@ export const useTelemetryStore = create<TelemetryState>((set, get) => ({
   geofenceAlerts: [],
   wsConnected: false,
   lastUpdate: 0,
+  history: [],
+  wsLatency: 0,
+  msgRate: 0,
   stats: {
     totalAircraft: 0,
     averageAltitude: 0,
@@ -113,6 +129,20 @@ export const useTelemetryStore = create<TelemetryState>((set, get) => ({
     })),
 
   setWsConnected: (connected) => set({ wsConnected: connected }),
+  setWsLatency: (ms) => set({ wsLatency: ms }),
+  setMsgRate: (rate) => set({ msgRate: rate }),
 
   getAircraftArray: () => Array.from(get().aircraft.values()),
+
+  pushHistory: () =>
+    set((state) => {
+      const point: HistoryPoint = {
+        timestamp: Date.now(),
+        tracks: state.aircraft.size,
+        detections: state.detections.length,
+        alerts: state.geofenceAlerts.length,
+      };
+      // Keep last 60 points (5 minutes at 5s intervals)
+      return { history: [...state.history, point].slice(-60) };
+    }),
 }));

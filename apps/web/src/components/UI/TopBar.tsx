@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { useTelemetryStore } from '../../store/useTelemetryStore';
+import { SignalIndicator } from './SignalIndicator';
 import { useState, useEffect } from 'react';
 
 interface SystemStats {
@@ -99,6 +100,8 @@ export function TopBar() {
       </div>
 
       <div className="top-bar-right">
+        <SignalIndicator />
+        <div className="stat-divider" />
         <div className="system-uptime">
           <span className="uptime-label">UPTIME</span>
           <span className="uptime-value">{sysStats ? formatUptime(sysStats.uptime) : '--:--:--'}</span>
