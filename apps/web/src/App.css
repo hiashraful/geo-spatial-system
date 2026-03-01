@@ -460,6 +460,13 @@ html, body, #root {
   border-bottom: 1px solid var(--border-color);
 }
 
+.filter-wrapper {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  position: relative;
+}
+
 .filter-input {
   flex: 1;
   background: #0a0e14;
@@ -471,6 +478,15 @@ html, body, #root {
   border-radius: 2px;
   outline: none;
   letter-spacing: 1px;
+}
+
+.filter-count {
+  position: absolute;
+  right: 6px;
+  font-size: 8px;
+  color: var(--text-accent);
+  letter-spacing: 0.5px;
+  pointer-events: none;
 }
 
 .filter-input:focus {
@@ -1116,6 +1132,58 @@ html, body, #root {
 /* ---- MEASURE CURSOR ---- */
 .app-root.measuring {
   cursor: crosshair !important;
+}
+
+/* ---- ALERT TICKER ---- */
+.alert-ticker {
+  display: flex;
+  align-items: center;
+  height: 20px;
+  background: linear-gradient(90deg, #0d1117ee 0%, #0d111799 100%);
+  border-bottom: 1px solid var(--border-color);
+  overflow: hidden;
+  position: relative;
+}
+
+.ticker-label {
+  position: relative;
+  z-index: 2;
+  font-size: 8px;
+  font-weight: 700;
+  color: var(--text-warning);
+  background: var(--bg-panel-solid);
+  padding: 0 8px;
+  letter-spacing: 1.5px;
+  border-right: 1px solid var(--border-color);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.ticker-track {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.ticker-content {
+  display: flex;
+  gap: 0;
+  white-space: nowrap;
+  animation: ticker-scroll 120s linear infinite;
+  font-size: 9px;
+  color: var(--text-secondary);
+  letter-spacing: 0.5px;
+}
+
+.ticker-content span {
+  padding-right: 80px;
+}
+
+@keyframes ticker-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
 /* ---- AIRCRAFT DRAWER ---- */

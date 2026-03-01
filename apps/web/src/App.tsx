@@ -11,6 +11,7 @@ import { BasemapSelector } from './components/UI/BasemapSelector';
 import { MeasureTool } from './components/UI/MeasureTool';
 import { WindIndicator } from './components/UI/WindIndicator';
 import { AircraftDrawer } from './components/UI/AircraftDrawer';
+import { AlertTicker } from './components/UI/AlertTicker';
 import { useWebSocket } from './hooks/useWebSocket';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useEffect, useReducer } from 'react';
@@ -32,6 +33,7 @@ function App() {
       <MapContainer />
       <div className="ui-overlay">
         <TopBar />
+        <AlertTicker />
         <div className="side-panels">
           <div className="left-panels">
             <LayerPanel />

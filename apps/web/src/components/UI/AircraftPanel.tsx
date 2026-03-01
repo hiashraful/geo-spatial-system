@@ -141,12 +141,17 @@ export function AircraftPanel() {
 
             {/* Filter and sort */}
             <div className="list-controls">
-              <input
-                className="filter-input"
-                placeholder="FILTER..."
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-              />
+              <div className="filter-wrapper">
+                <input
+                  className="filter-input"
+                  placeholder="FILTER..."
+                  value={filter}
+                  onChange={(e) => setFilter(e.target.value)}
+                />
+                {filter && (
+                  <span className="filter-count">{sortedAircraft.length}/{aircraft.size}</span>
+                )}
+              </div>
               <div className="sort-buttons">
                 {(['callsign', 'altitude', 'velocity'] as const).map((s) => (
                   <button
