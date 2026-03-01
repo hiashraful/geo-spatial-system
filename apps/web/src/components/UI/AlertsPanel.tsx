@@ -1,13 +1,36 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTelemetryStore } from '../../store/useTelemetryStore';
 import { useMapStore } from '../../store/useMapStore';
 
 export function AlertsPanel() {
   const [collapsed, setCollapsed] = useState(false);
+  const [flashing, setFlashing] = useState(false);
   const geofenceAlerts = useTelemetryStore((s) => s.geofenceAlerts);
   const setSelectedAircraft = useMapStore((s) => s.setSelectedAircraft);
   const flyTo = useMapStore((s) => s.flyTo);
+  const alertsMuted = useMapStore((s) => s.alertsMuted);
+  const toggleAlertsMuted = useMapStore((s) => s.toggleAlertsMuted);
+  const prevCount = useRef(0);
+
+  // Flash on new alerts
+  useEffect(() => {
+    const handler = () => {
+      setFlashing(true);
+      setTimeout(() => setFlashing(false), 1500);
+    };
+    window.addEventListener('geofence-alert-flash', handler);
+    return () => window.removeEventListener('geofence-alert-flash', handler);
+  }, []);
+
+  // Also detect new alerts directly (for initial load race)
+  useEffect(() => {
+    if (geofenceAlerts.length > prevCount.current && prevCount.current > 0) {
+      setFlashing(true);
+      setTimeout(() => setFlashing(false), 1500);
+    }
+    prevCount.current = geofenceAlerts.length;
+  }, [geofenceAlerts]);
 
   const handleAlertClick = (alert: typeof geofenceAlerts[0]) => {
     setSelectedAircraft(alert.aircraft.icao24);
@@ -19,13 +42,25 @@ export function AlertsPanel() {
       initial={{ y: 100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.3, delay: 0.5 }}
-      className="alerts-panel"
+      className={`alerts-panel ${flashing ? 'alert-flash' : ''}`}
     >
       <div className="panel-header alert-header" onClick={() => setCollapsed(!collapsed)}>
         <span className="panel-title">
           ALERTS {geofenceAlerts.length > 0 && <span className="alert-badge">{geofenceAlerts.length}</span>}
         </span>
-        <span className="panel-toggle">{collapsed ? '+' : '-'}</span>
+        <span className="alert-controls">
+          <button
+            className={`mute-btn ${alertsMuted ? 'muted' : ''}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleAlertsMuted();
+            }}
+            title={alertsMuted ? 'Unmute alerts' : 'Mute alerts'}
+          >
+            {alertsMuted ? 'MUTED' : 'SND'}
+          </button>
+          <span className="panel-toggle">{collapsed ? '+' : '-'}</span>
+        </span>
       </div>
 
       <AnimatePresence>

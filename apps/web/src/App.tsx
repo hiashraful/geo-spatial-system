@@ -24,6 +24,7 @@ import { Timeline } from './components/UI/Timeline';
 import { ViewModeSelector } from './components/UI/ViewModeSelector';
 import { useWebSocket } from './hooks/useWebSocket';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
+import { useAlertNotification } from './hooks/useAlertNotification';
 import { useMapStore } from './store/useMapStore';
 import { useEffect, useReducer } from 'react';
 import './App.css';
@@ -31,6 +32,7 @@ import './App.css';
 function App() {
   useWebSocket();
   useKeyboardShortcuts();
+  useAlertNotification();
   const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
   const viewMode = useMapStore((s) => s.viewMode);
 

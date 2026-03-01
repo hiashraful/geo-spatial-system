@@ -38,6 +38,7 @@ interface MapState {
   selectedAircraft: string | null;
   selectedCamera: string | null;
   flyToTarget: FlyToTarget | null;
+  alertsMuted: boolean;
   setCenter: (center: [number, number]) => void;
   setZoom: (zoom: number) => void;
   setView: (center: [number, number], zoom: number) => void;
@@ -53,6 +54,7 @@ interface MapState {
   setSelectedCamera: (cameraId: string | null) => void;
   flyTo: (center: [number, number], zoom?: number) => void;
   clearFlyTo: () => void;
+  toggleAlertsMuted: () => void;
 }
 
 export const useMapStore = create<MapState>()(
@@ -79,6 +81,7 @@ export const useMapStore = create<MapState>()(
       selectedAircraft: null,
       selectedCamera: null,
       flyToTarget: null,
+      alertsMuted: false,
       setCenter: (center) => set({ center }),
       setZoom: (zoom) => set({ zoom }),
       setView: (center, zoom) => set({ center, zoom }),
@@ -100,6 +103,7 @@ export const useMapStore = create<MapState>()(
       setSelectedCamera: (cameraId) => set({ selectedCamera: cameraId }),
       flyTo: (center, zoom) => set({ flyToTarget: { center, zoom } }),
       clearFlyTo: () => set({ flyToTarget: null }),
+      toggleAlertsMuted: () => set((state) => ({ alertsMuted: !state.alertsMuted })),
     }),
     {
       name: 'geo-map-state',
