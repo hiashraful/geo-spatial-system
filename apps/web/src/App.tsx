@@ -22,6 +22,7 @@ import { SearchDialog } from './components/UI/SearchDialog';
 import { DataExport } from './components/UI/DataExport';
 import { Timeline } from './components/UI/Timeline';
 import { ViewModeSelector } from './components/UI/ViewModeSelector';
+import { SettingsPanel } from './components/UI/SettingsPanel';
 import { useWebSocket } from './hooks/useWebSocket';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useAlertNotification } from './hooks/useAlertNotification';
@@ -81,6 +82,7 @@ function App() {
       </div>
       <ShortcutsModal />
       <SearchDialog />
+      <SettingsPanel />
     </div>
   );
 }

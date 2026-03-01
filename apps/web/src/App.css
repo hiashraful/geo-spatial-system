@@ -1985,6 +1985,213 @@ html, body, #root {
   width: 100%;
 }
 
+/* ---- SETTINGS PANEL ---- */
+.settings-gear {
+  position: fixed;
+  bottom: 30px;
+  right: 8px;
+  z-index: 500;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 8px;
+  padding: 4px 6px;
+  cursor: pointer;
+  border-radius: 2px;
+  letter-spacing: 1px;
+  transition: all 0.2s;
+}
+
+.settings-gear:hover {
+  color: var(--text-accent);
+  border-color: var(--border-active);
+  background: var(--green-glow);
+}
+
+.settings-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-panel {
+  background: var(--bg-panel-solid);
+  border: 1px solid var(--border-active);
+  border-radius: 4px;
+  width: 380px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 0 30px rgba(0, 255, 136, 0.08);
+}
+
+.settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--bg-header);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.settings-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-accent);
+  letter-spacing: 2px;
+}
+
+.settings-close {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 2px 8px;
+  cursor: pointer;
+  border-radius: 2px;
+}
+
+.settings-close:hover {
+  color: var(--text-error);
+  border-color: var(--text-error);
+}
+
+.settings-body {
+  padding: 10px 14px;
+}
+
+.settings-section {
+  margin-bottom: 14px;
+}
+
+.settings-section-title {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--text-accent);
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.settings-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.settings-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+.settings-toggle-group {
+  display: flex;
+  gap: 2px;
+}
+
+.settings-toggle {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  padding: 3px 8px;
+  cursor: pointer;
+  border-radius: 2px;
+  letter-spacing: 1px;
+  transition: all 0.15s;
+}
+
+.settings-toggle:hover {
+  border-color: var(--text-accent);
+  color: var(--text-primary);
+}
+
+.settings-toggle.active {
+  background: var(--text-accent);
+  color: #000;
+  border-color: var(--text-accent);
+  font-weight: 600;
+}
+
+.settings-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.settings-slider {
+  width: 100px;
+  height: 3px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--border-color);
+  border-radius: 2px;
+  outline: none;
+}
+
+.settings-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--text-accent);
+  cursor: pointer;
+}
+
+.settings-slider-value {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--text-accent);
+  min-width: 40px;
+  text-align: right;
+}
+
+.settings-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 14px;
+  background: var(--bg-header);
+  border-top: 1px solid var(--border-color);
+}
+
+.settings-hint {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: var(--text-secondary);
+  letter-spacing: 1px;
+}
+
+.settings-reset {
+  background: transparent;
+  border: 1px solid var(--text-error);
+  color: var(--text-error);
+  font-family: var(--font-mono);
+  font-size: 8px;
+  padding: 3px 8px;
+  cursor: pointer;
+  border-radius: 2px;
+  letter-spacing: 1px;
+  transition: all 0.15s;
+}
+
+.settings-reset:hover {
+  background: var(--red-glow);
+}
+
 /* ---- RESPONSIVE ---- */
 @media (max-width: 768px) {
   .left-panels, .right-panels {
